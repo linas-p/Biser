@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/linas-p/Biser.svg?branch=master)](https://travis-ci.org/linas-p/Biser)
 
 To test:
 
