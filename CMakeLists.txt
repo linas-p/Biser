@@ -15,6 +15,7 @@ execute_process(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+
 include_directories( "${SRC_DIR}" "${INC_DIR}"
 	${JSON_DIR}/src )
 
