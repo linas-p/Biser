@@ -1,0 +1,38 @@
+{
+  "output_file": "result.dat",
+  "n": 100,
+  "dt": 1e-2,
+  "equations_params": {
+    "vmax_1": 4e-5,
+    "vmax_2": 1e-5,
+    "km_1": 8e-5,
+    "km_2": 2e-5,
+    "k1": 4e-3,
+    "k2": 2e-3
+  },
+  "initial_conditions": {
+    "product_0": 0,
+    "glucose_0": 1e-5,
+    "oxygen_0": 1.2e-6,
+    "e1_oxi": 1e-9,
+    "e1_red": 0,
+    "e2_oxi": 1e-9,
+    "e2_red": 0
+  },
+  "layers": {
+    "layer1": {
+      "enzyme": true,
+      "Diff_product": 2.1e-6,
+      "Diff_glucose": 2.1e-6,
+      "Diff_oxygen": 0.66e-5,
+      "layer_length": 0.1
+    },
+    "layer2": {
+      "enzyme": false,
+      "Diff_product": 6.3e-6,
+      "Diff_glucose": 6.2e-6,
+      "Diff_oxygen": 2e-5,
+      "layer_length": 0.9
+    }
+  }
+}
