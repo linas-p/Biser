@@ -238,7 +238,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
 
         // Skaičiuojamas srovės tankis
-        i = bio_info->ne * F * bio_info->layers[0].Dp * \
+        i = bio_info->ne * F * bio_info->layers[0].Dpr * \
             (current_pr[1] - current_pr[0]) / space_steps[0];
         di = fabs(i - last_i);
         last_i = i;
@@ -266,9 +266,11 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
         // Spausdinami rezultatai
         if ((t % INTERVAL) == 0) {
+            printf("start %d %s \n", t, out_file_name);
             output_file = fopen(out_file_name, "a");
             fprintf(output_file, "%e %e \n", i, execution_time);
             fclose(output_file);
+                printf("start %d \n", t);
             if (callback_crunched != NULL)
                 callback_crunched(ptr, execution_time);
         }

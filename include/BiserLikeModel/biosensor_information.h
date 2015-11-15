@@ -18,35 +18,22 @@ enum resp_method {
 struct layer_params {
     // Laukas nurodo ar tai fermento sluoksnis
     int enz_layer;
+    
     // Difuzijos koeficientai (cm^2/s)
-    double Ds;
-    double Dp;
-
     double Dg;
     double Dpr;
     double Do2;
 
     // Sluoksnio storis (cm)
     double d;
-
-    // Fermento koncentracija (mol/cm^3)
-    double e0;
 };
 
 struct bio_params {
-    // Laukas nurodo ar naudojama išreikštinė schema (priešingu atveju bus
-    // naudojama neišreikštinė schema)
-    int explicit_scheme;
-    // Laukas nurodo ar vyksta substrato inhibicija
-    int subs_inh;
-    // Laukas nurodo ar vyksta produkto inhibicija
-    int prod_inh;
+
     // Reakcijos greičio konstanta k2 (s^-1)
     double k1, k2;
     // Pusiausvyros konstantos (mol/cm^3)
-    double km, km1, km2;
-    double ks;
-    double kp;
+    double km1, km2;
 
     double vmax1, vmax2;
 
@@ -64,10 +51,8 @@ struct bio_params {
     char *out_file_name;
     // Elektronų, dalyvaujančių krūvio pernešime, skaičius
     int ne;
-    // Substrato koncentracija tirpale (mol/cm^3)
-    double s0;
-    // Produkto koncentracija tirpale (mol/cm^3)
-    double p0;
+
+    // Pradinės koncentracijos tirpale (mol/cm^3)
     double pr_0;
     double g_0;
     double o2_0;
@@ -77,6 +62,7 @@ struct bio_params {
     double e2red_0;
     // Biojutiklio sluoksnių skaičius
     int layer_count;
+    
     // Biojutiklio sluoksnių masyvas
     struct layer_params *layers;
 };
