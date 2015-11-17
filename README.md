@@ -2,7 +2,21 @@
 
 Requirements: c++11 i.e g++4.8/clang3.3 or better
 
-To test:
+
+To compile type
+
+```sh
+make
+```
+
+
+
+
+
+----------------------------------
+
+
+To test raw code:
 
 ```sh
 $ mkdir build
