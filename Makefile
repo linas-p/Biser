@@ -21,7 +21,7 @@ SRC_DIR = ./src
 JSON_INC =./external/json/src
 
 %.o : %.cpp
-	PKG_CPPFLAGS="--std=c++11 -fPIC -shared $(RCPPFLAGS) $(RCPPINCL) -I$(JSON_INC) -I$(INC_DIR)/" PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS)" R CMD SHLIB $<
+	PKG_CPPFLAGS="-std=c++11 -fPIC -shared $(RCPPFLAGS) $(RCPPINCL) -I$(JSON_INC) -I$(INC_DIR)/" PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS)" R CMD SHLIB $<
 
 cpp_sources := $(wildcard $(SRC_DIR)/*.cpp ./calculator_r.cpp)
 cpp_sharedlibs := $(patsubst %.cpp,%.o,$(cpp_sources))
