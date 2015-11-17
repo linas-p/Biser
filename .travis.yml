@@ -9,6 +9,7 @@ before_install:
 
 install:
   - sudo apt-get install -qq g++-4.8 r-base
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
   - export CXX="g++-4.8"
   - CC="gcc-4.8"
 
