@@ -25,5 +25,3 @@ before_script:
 
 script:
   - make
-  - cd ..
-  - make
