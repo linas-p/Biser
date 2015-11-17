@@ -10,7 +10,7 @@ Install c++4.9(optional)
 ```sh
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test # gcc-4.9
 sudo apt-get update
-apt-get install g++-4.9
+sudo apt-get install g++-4.9
 
 ```
 To test cpp sample:
@@ -43,14 +43,20 @@ apt-get install r-base
 Install R packages(first time only)
 ```sh
 R
-install.packages(Rcpp, dependencies=TRUE)
-install.packages(shiny, dependencies=TRUE)
+install.packages("Rcpp", dependencies=TRUE)
+install.packages("shiny", dependencies=TRUE)
 quit()
 ```
 
 To compile type
 ```sh
 make
+```
+
+Usage 
+```sh
+R
+shiny::runApp()
 ```
 
 
