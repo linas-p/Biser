@@ -14,7 +14,15 @@
 
 namespace BiserLikeModel {
 void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
-                          void (*callback_crunched)(void *, int)) {
+                          void (*callback_crunched)(void *, int),
+                          std::vector<double> * P,\
+                          std::vector<double> * G,\
+                          std::vector<double> * O2,\
+                          std::vector<double> * Ox1,\
+                          std::vector<double> * Ox2,\
+                          std::vector<double> * Red1,\
+                          std::vector<double> * Red2
+                         ) {
     int a;
 
     // Srovės tankis
@@ -51,6 +59,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
     // Rezultatų saugojimui skirtas failas
     FILE *output_file;
+    bool write_to_file = bio_info->write_to_file;
 
     // Sukuriami lokalūs kintamieji dėl optimizavimo
     double k1                    = bio_info->k1;
@@ -80,9 +89,10 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double v_max2                  = bio_info->vmax2;
 
     // Sukuriamas rezultatų saugojimui skirtas failas
-    output_file = fopen(out_file_name, "w");
-    fclose(output_file);
-
+    if(write_to_file) {
+        output_file = fopen(out_file_name, "w");
+        fclose(output_file);
+    }
     // Apskaičiuojamas tinklo taškų skaičius per visus biojutiklio sluoksnius
     point_count = layer_count * n + 1;
     printf("start ini %d \n", point_count);
@@ -267,10 +277,12 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         // Spausdinami rezultatai
         if ((t % INTERVAL) == 0) {
             printf("start %d %s \n", t, out_file_name);
-            output_file = fopen(out_file_name, "a");
-            fprintf(output_file, "%e %e \n", i, execution_time);
-            fclose(output_file);
-                printf("start %d \n", t);
+            if(write_to_file) {
+                output_file = fopen(out_file_name, "a");
+                fprintf(output_file, "%e %e \n", i, execution_time);
+                fclose(output_file);
+            }
+            printf("start %d \n", t);
             if (callback_crunched != NULL)
                 callback_crunched(ptr, execution_time);
         }
@@ -298,11 +310,21 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     } while (!response_time_reached);
 
     // Atspausdinamas paskutinis taškas
-    output_file = fopen(out_file_name, "a");
-    fprintf(output_file, "%e %e\n", i, execution_time);
-    fclose(output_file);
+    if(write_to_file) {
+        output_file = fopen(out_file_name, "a");
+        fprintf(output_file, "%e %e\n", i, execution_time);
+        fclose(output_file);
+    }
     if (callback_crunched != NULL)
         callback_crunched(ptr, execution_time);
+
+    concatenate_vals( last_g, G, point_count);
+    concatenate_vals( last_pr, P, point_count);
+    concatenate_vals( last_o2, O2, point_count);
+    concatenate_vals( last_1ox, Ox1, point_count);
+    concatenate_vals( last_2ox, Ox2, point_count);
+    concatenate_vals( last_1red, Red1, point_count);
+    concatenate_vals( last_2red, Red2, point_count);
 
     // Atlaisvinama atmintis
     free(current_g);

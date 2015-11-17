@@ -36,4 +36,10 @@ void print_array(double *array, int length) {
     printf("--- \n");
     fflush(stdout);
 }
+
+void concatenate_vals(double *x, std::vector<double> * out, int length) {
+    std::vector<double> tmp(x, (x + length));
+    out->insert(out->end(), tmp.begin(), tmp.end());
+}
+
 }  // namespace BiserLikeModel

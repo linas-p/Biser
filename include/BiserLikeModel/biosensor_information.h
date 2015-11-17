@@ -18,7 +18,7 @@ enum resp_method {
 struct layer_params {
     // Laukas nurodo ar tai fermento sluoksnis
     int enz_layer;
-    
+
     // Difuzijos koeficientai (cm^2/s)
     double Dg;
     double Dpr;
@@ -49,6 +49,7 @@ struct bio_params {
     double resp_t;
     // Išvedimo failas
     char *out_file_name;
+    bool write_to_file;
     // Elektronų, dalyvaujančių krūvio pernešime, skaičius
     int ne;
 
@@ -62,7 +63,7 @@ struct bio_params {
     double e2red_0;
     // Biojutiklio sluoksnių skaičius
     int layer_count;
-    
+
     // Biojutiklio sluoksnių masyvas
     struct layer_params *layers;
 };

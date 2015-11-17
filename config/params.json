@@ -1,6 +1,6 @@
 {
   "n": 100,
-  "dt": 1e-2,
+  "dt": 1e-4,
   "equations_params": {
     "vmax_1": 4e-5,
     "vmax_2": 1e-5,
