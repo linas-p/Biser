@@ -35,7 +35,8 @@ struct bio_params {
     // Pusiausvyros konstantos (mol/cm^3)
     double km1, km2;
 
-    double vmax1, vmax2;
+	double kcat1, kcat2;
+    // double vmax1, vmax2;
 
     // Žingsnis pagal laiką (s)
     double dt;

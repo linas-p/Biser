@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctime>
 #include <BiserLikeModel/utils.h>
 #include <BiserLikeModel/constants.h>
 #include <BiserLikeModel/explicit_calculator.h>
@@ -64,6 +65,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     // Sukuriami lokalūs kintamieji dėl optimizavimo
     double k1                    = bio_info->k1;
     double k2                    = bio_info->k2;
+    double kcat1                    = bio_info->kcat1;
+    double kcat2                    = bio_info->kcat2;
     double km1                    = bio_info->km1;
     double km2                    = bio_info->km2;
     double dt                    = bio_info->dt;
@@ -85,8 +88,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double Do2, Do20, Do21;
 
     double dx, dx0, dx1;
-    double v_max1                  = bio_info->vmax1;
-    double v_max2                  = bio_info->vmax2;
+    //double v_max1                  = bio_info->vmax1;
+    //double v_max2                  = bio_info->vmax2;
 
     // Sukuriamas rezultatų saugojimui skirtas failas
     if(write_to_file) {
@@ -131,7 +134,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         space_steps[a] = bio_info->layers[a].d / n;
 
 
-
+	std::clock_t start = std::clock();
     printf("start\n");
     do {
         // Iteruojama per biojutiklio sluoksnius,
@@ -163,21 +166,24 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                 dx = space_steps[layer];
             } else {
                 // Įskaičiuojama difuzijos įtaka
-                current_g[a] = dt * Dg * \
-                               (last_g[a + 1] - 2 * last_g[a] + \
-                                last_g[a - 1]) / (dx * dx) + \
-                               last_g[a];
-                current_pr[a] = dt * Dpr * \
-                                (last_pr[a + 1] - 2 * last_pr[a] + \
-                                 last_pr[a - 1]) / (dx * dx) + \
-                                last_pr[a];
+                current_g[a] = dt * Dg *
+                               (last_g[a + 1] - 2 * last_g[a] +
+                                last_g[a - 1]) / (dx * dx) +
+                               last_g[a]; //+
+							   //2*dt*Dg*(last_g[a + 1] - last_g[a])/(dx * last_g[a]);//  polar laplacian
+                current_pr[a] = dt * Dpr *
+                                (last_pr[a + 1] - 2 * last_pr[a] +
+                                 last_pr[a - 1]) / (dx * dx) +
+                                last_pr[a];// +
+							   //2*dt*Dpr*(last_pr[a + 1] - last_pr[a])/(dx * last_g[a]);//  polar laplacian
 
 
 
-                current_o2[a] = dt * Do2 * \
-                                (last_o2[a + 1] - 2 * last_o2[a] \
-                                 + last_o2[a - 1]) / (dx * dx) + \
-                                last_o2[a];
+                current_o2[a] = dt * Do2 *
+                                (last_o2[a + 1] - 2 * last_o2[a]
+                                 + last_o2[a - 1]) / (dx * dx) +
+                                last_o2[a];// +
+							   //2*dt*Do2*(last_o2[a + 1] - last_o2[a])/(dx * last_g[a]);//  polar laplacian
 
 
 
@@ -188,12 +194,12 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                     current_1ox[a] = dt * 2 * k1 * last_1red[a] + last_1ox[a];
                     current_1red[a] = -dt * 2 * k1 * last_1red[a] + \
                                       last_1red[a];
-                    current_2ox[a] = -dt * 4 * k2 * last_2ox[a] + last_2ox[a];
-                    current_2red[a] = dt * 4 * k2 * last_2ox[a] + last_2red[a];
+                    current_2ox[a] = -dt * 2 * k2 * last_1red[a] + last_2ox[a];
+                    current_2red[a] = dt * 2 * k2 * last_1red[a] + last_2red[a];
 
-                    kinetics_partg = dt * v_max1 * last_g[a] / \
+                    kinetics_partg = dt * e1ox_0 * kcat1 * last_g[a] / \
                                      (last_g[a]+km1);
-                    kinetics_parto2 = dt * v_max2 * last_o2[a] / \
+                    kinetics_parto2 = dt * e2ox_0 * kcat2 * last_o2[a] / \
                                       (last_o2[a]+km2);
 
                     current_g[a] -=    kinetics_partg;
@@ -308,6 +314,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             break;
         }
     } while (!response_time_reached);
+
+	double duration = ( std::clock() - start ) / static_cast<double>(CLOCKS_PER_SEC);
+	printf("operations per sec %d \n", t/duration);
 
     // Atspausdinamas paskutinis taškas
     if(write_to_file) {

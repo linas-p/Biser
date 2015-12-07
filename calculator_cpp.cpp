@@ -9,14 +9,13 @@
 #include <fstream>
 #include <BiserLikeModel/biosensor_information.h>
 #include <BiserLikeModel/explicit_calculator.h>
-#include <json.hpp>
+
 
 using namespace BiserLikeModel;
-using json = nlohmann::json;
 
-void callback_crunched(void *ptr, int time) {
-    printf("%ds simulated\n", time);
-}
+#ifdef JSON
+#include <json.hpp>
+using json = nlohmann::json;
 
 void json_fill(struct bio_params *bio_info, std::string configs = "../config/params.json") {
     json j;
@@ -33,8 +32,10 @@ void json_fill(struct bio_params *bio_info, std::string configs = "../config/par
     bio_info->km2 = j["equations_params"]["km_2"];
 
     // [mol/l] -> [mol/cm^3]
-    bio_info->vmax1 = j["equations_params"]["vmax_1"];
-    bio_info->vmax2 = j["equations_params"]["vmax_2"];
+    //bio_info->vmax1 = j["equations_params"]["vmax_1"];
+    //bio_info->vmax2 = j["equations_params"]["vmax_2"];
+    bio_info->kcat1 = j["equations_params"]["kcat1"];
+    bio_info->kcat2 = j["equations_params"]["kcat2"];
 
     // [s]
     bio_info->dt = j["dt"];
@@ -82,7 +83,11 @@ void json_fill(struct bio_params *bio_info, std::string configs = "../config/par
     bio_info->layers[1].d = j["layers"]["layer2"]["layer_length"];
 
 }
+#endif
 
+void callback_crunched(void *ptr, int time) {
+    printf("%ds simulated\n", time);
+}
 
 void static_fill(struct bio_params *bio_info) {
 
@@ -94,8 +99,11 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->km1 = 8 * 1e-5;
     bio_info->km2 = 2 * 1e-5;
     // [mol/l] -> [mol/cm^3]
-    bio_info->vmax1 = 4 * 1e-5;
-    bio_info->vmax2 = 1e-5;
+    //bio_info->vmax1 = 4 * 1e-5;
+    //bio_info->vmax2 = 1e-5;
+    bio_info->kcat1 = 100;
+    bio_info->kcat2 = 100;
+
 
     // [s]
     bio_info->dt = 1e-2;
@@ -145,8 +153,12 @@ void static_fill(struct bio_params *bio_info) {
 int main() {
     struct bio_params *bio_info = new bio_params;
     std::vector<double> P, G, O2, Ox1, Ox2, Red1, Red2;
-    // static_fill(bio_info);
+
+#ifdef JSON
     json_fill(bio_info);
+#else
+    static_fill(bio_info);
+#endif
     calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &G, &O2, \
                          &Ox1, &Ox2, &Red1, &Red2);
 
