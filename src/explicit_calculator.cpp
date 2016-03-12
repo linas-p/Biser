@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2015
+ *  Copyright (c) Linas Petkevicius 2016
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -87,7 +87,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double Dpr, Dpr0, Dpr1;
     double Do2, Do20, Do21;
 
-    double dx, dx0, dx1;
+    double dr, dr0, dr1;
     //double v_max1                  = bio_info->vmax1;
     //double v_max2                  = bio_info->vmax2;
 
@@ -146,7 +146,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         Dpr = bio_info->layers[layer].Dpr;
         Do2 = bio_info->layers[layer].Do2;
 
-        dx = space_steps[layer];
+        dr = space_steps[layer];
 
         for (a = 1; a < point_count - 1; a++) {
             // Nustatome ar tai nėra sluoksnių sandūra
@@ -163,29 +163,19 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                 Dpr = bio_info->layers[layer].Dpr;
                 Do2 = bio_info->layers[layer].Do2;
 
-                dx = space_steps[layer];
+                dr = space_steps[layer];
             } else {
                 // Įskaičiuojama difuzijos įtaka
-                current_g[a] = dt * Dg *
-                               (last_g[a + 1] - 2 * last_g[a] +
-                                last_g[a - 1]) / (dx * dx) +
-                               last_g[a]; //+
-							   //2*dt*Dg*(last_g[a + 1] - last_g[a])/(dx * last_g[a]);//  polar laplacian
-                current_pr[a] = dt * Dpr *
-                                (last_pr[a + 1] - 2 * last_pr[a] +
-                                 last_pr[a - 1]) / (dx * dx) +
-                                last_pr[a];// +
-							   //2*dt*Dpr*(last_pr[a + 1] - last_pr[a])/(dx * last_g[a]);//  polar laplacian
+                current_g[a] = dt * Dg * ((last_g[a + 1] - 2 * last_g[a] + last_g[a - 1]) / (dr * dr) +
+					  (last_g[a + 1] - last_g[a - 1]) / (a * 2 * dr * dr))+
+                               last_g[a];
+                current_pr[a] = dt * Dpr * ((last_pr[a + 1] - 2 * last_pr[a] + last_pr[a - 1]) / (dr * dr) +
+					  (last_pr[a + 1] - last_pr[a - 1]) / (a * 2 * dr * dr))+
+                                last_pr[a];
 
-
-
-                current_o2[a] = dt * Do2 *
-                                (last_o2[a + 1] - 2 * last_o2[a]
-                                 + last_o2[a - 1]) / (dx * dx) +
-                                last_o2[a];// +
-							   //2*dt*Do2*(last_o2[a + 1] - last_o2[a])/(dx * last_g[a]);//  polar laplacian
-
-
+                current_o2[a] = dt * Do2 * ((last_o2[a + 1] - 2 * last_o2[a] + last_o2[a - 1]) / (dr * dr) +
+					  (last_o2[a + 1] - last_o2[a - 1]) / (a * 2 * dr * dr))+
+                                last_o2[a];
 
 
                 // Jeigu sluoksnis yra fermentinis,
@@ -223,30 +213,30 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             Dpr0 = bio_info->layers[layer].Dpr;
             Do20 = bio_info->layers[layer].Do2;
 
-            dx0 = space_steps[layer];
+            dr0 = space_steps[layer];
 
             Dg1 = bio_info->layers[layer + 1].Dg;
             Dpr1 = bio_info->layers[layer + 1].Dpr;
             Do21 = bio_info->layers[layer + 1].Do2;
 
 
-            dx1 = space_steps[layer + 1];
+            dr1 = space_steps[layer + 1];
 
-            current_g[a] = (Dg1 * dx0 * current_g[a + 1] + \
-                            Dg0 * dx1 * current_g[a - 1]) / \
-                           (Dg1 * dx0 + Dg0 * dx1);
-            current_pr[a] = (Dpr1 * dx0 * current_pr[a + 1] + \
-                             Dpr0 * dx1 * current_pr[a - 1]) / \
-                            (Dpr1 * dx0 + Dpr0 * dx1);
-            current_o2[a] = (Do21 * dx0 * current_o2[a + 1] + \
-                             Do20 * dx1 * current_o2[a - 1]) / \
-                            (Do21 * dx0 + Do20 * dx1);
+            current_g[a] = (Dg1 * dr0 * current_g[a + 1] + \
+                            Dg0 * dr1 * current_g[a - 1]) / \
+                           (Dg1 * dr0 + Dg0 * dr1);
+            current_pr[a] = (Dpr1 * dr0 * current_pr[a + 1] + \
+                             Dpr0 * dr1 * current_pr[a - 1]) / \
+                            (Dpr1 * dr0 + Dpr0 * dr1);
+            current_o2[a] = (Do21 * dr0 * current_o2[a + 1] + \
+                             Do20 * dr1 * current_o2[a - 1]) / \
+                            (Do21 * dr0 + Do20 * dr1);
         }
 
         // Kraštinė substrato nepratekėjimo sąlyga
-        current_g[0] = current_g[1];
-        current_pr[0] = current_pr[1];
-        current_o2[0] = current_o2[1];
+        current_g[0] = last_g[0] -  dt * Dg * 4 * (last_g[1] - last_g[0]) / (dr * dr) + k1 * last_g[0]/(km1 + last_g[0]);
+        current_pr[0] = last_pr[0] +  dt * Dg * 4 * (last_pr[1] - last_pr[0]) / (dr * dr) + k1 * last_pr[0]/(km1 + last_pr[0]);
+        current_o2[0] = last_o2[0] -  dt * Dg * 4 * (last_o2[1] - last_o2[0]) / (dr * dr) + k2 * last_o2[0]/(km2 + last_o2[0]);
 
         current_g[point_count - 1] = current_g[point_count - 2];
         current_pr[point_count - 1] = current_pr[point_count - 2];

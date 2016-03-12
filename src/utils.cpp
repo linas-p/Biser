@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2015
+ *  Copyright (c) Linas Petkevicius 2016
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -7,6 +7,7 @@
 #include <BiserLikeModel/utils.h>
 
 namespace BiserLikeModel {
+
 void swap_arrays(double **array1, double **array2) {
     double *temp;
 

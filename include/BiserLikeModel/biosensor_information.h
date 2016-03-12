@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2015
+ *  Copyright (c) Linas Petkevicius 2016
  *  Vilnius University
  *  GNU General Public license
  * */
