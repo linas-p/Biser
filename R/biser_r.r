@@ -1,101 +1,72 @@
 source("initial.r");
 
 last_g <- rep(0, grid_size);
-last_g[N_l:grid_size] <- G_0;
+last_g[(N_R0+1):grid_size] <- G_0;
 last_p <- rep(0, grid_size);
-last_o2 <- rep(O2_0, grid_size);
-last_1ox <- rep(E1OX_0, grid_size);
-last_2ox <- rep(E2OX_0, grid_size);
-last_1red <- rep(0, grid_size);
-last_2red <- rep(0, grid_size);
-
-current_g <- rep(0, grid_size);
-current_p <- rep(0, grid_size);
-current_o2 <- rep(0, grid_size);
-current_1ox <- rep(0, grid_size);
-current_2ox <- rep(0, grid_size);
-current_1red <- rep(0, grid_size);
-current_2red <- rep(0, grid_size);
 
 
+current_g <- rep(-1, grid_size);
+current_p <- rep(-1, grid_size);
 
-for(time in 0:100) {
-#pin<- function()
-#    {
-
-    for(k in 2:(N_l-1)) {
-        kinetics_partg <- dt*VMAX1*last_g[k]/(KM1+last_g[k]);
-        kinetics_parto2 <- dt*VMAX2*last_o2[k]/(KM2+last_o2[k]);
+delta <- 1/((R^3-R_1^3)/(3*R_1^2));
 
 
-        current_g[k] <- last_g[k] + got_dif(last_g, k, DG_r, dt, dx1) - kinetics_partg;
-        current_p[k] <- last_p[k] + got_dif(last_p, k, DP_r, dt, dx1) + kinetics_partg;
-        current_1ox[k] <- last_1ox[k] + dt*2*K1*last_1red[k]  - kinetics_partg;
-        current_1red[k] <- last_1red[k] - dt*2*K1*last_1red[k]+ kinetics_partg;
-
-        current_2ox[k] <- last_2ox[k] - dt*4*K2*last_2ox[k]   + kinetics_parto2;
-        current_2red[k] <- last_2red[k] + dt*4*K2*last_2ox[k] - kinetics_parto2;
-        current_o2[k] <- last_o2[k] + got_dif(last_o2, k, DO2_r, dt, dx1) - kinetics_parto2;
+for(time in 0:1000000) {
+    for(k in 2:(N_R0-1)) {
+        kinetics_partg <- dt * VMAX1 * last_g[k] / (KM1 + last_g[k]);
+        current_g[k] <- last_g[k] + dt * DG_m * ((last_g[k+1] - 2*last_g[k] +
+                last_g[k-1])/(dx_m^2) +
+                (2/k)*(last_g[k+1]-last_g[k])
+                /(dx_m^2)) - kinetics_partg;
+        current_p[k] <- last_p[k] + dt * DP_m * ((last_p[k+1] - 2*last_p[k] +
+                last_p[k-1])/(dx_m^2) +
+                (2/k)*(last_p[k+1]-last_p[k])
+                /(dx_m^2)) + kinetics_partg;
     }
 
-    for(k in (N_l+1):(grid_size-1)) {
-        current_g[k] <- last_g[k] + got_dif(last_g, k, DG_g, dt, dx2);
-        current_p[k] <- last_p[k] + got_dif(last_p, k, DP_g, dt, dx2);
-        current_o2[k] <- last_o2[k] + got_dif(last_o2, k, DO2_g, dt, dx2);
+    current_g[1] <- last_g[1] + dt * DG_m * 2 * (last_g[2] - last_g[1])/(dx_m^2)
+    - kinetics_partg;
+    current_p[1] <- last_p[1] + dt * DP_m * 2 * (last_p[2] - last_p[1])/(dx_m^2)
+    + kinetics_partg;
+
+    current_g[N_R0] = (DG_d * dx_m * last_g[N_R0+1] +
+                       DG_m * dx_d * last_g[N_R0-1]) /
+                      (DG_d * dx_m + DG_m * dx_d);
+    current_p[N_R0] = (DP_d * dx_m * last_p[N_R0+1] +
+                       DP_m * dx_d * last_p[N_R0-1]) /
+                      (DP_d * dx_m + DP_m * dx_d);
+
+    for(k in (N_R0+1):(N_R1-1)) {
+        current_g[k] <- last_g[k] + dt * DG_d * ((last_g[k+1] -
+                2*last_g[k] + last_g[k-1]) /
+                (dx_d^2) + (2/k)*(last_g[k+1]-last_g[k])/(dx_d^2));
+        current_p[k] <- last_p[k] + dt * DP_d * ((last_p[k+1] -
+                2*last_p[k] + last_p[k-1]) /
+                (dx_d^2) + (2/k)*(last_p[k+1]-last_p[k])/(dx_d^2));
     }
 
-    current_g[N_l] = got_mid(current_g[N_l+1], DG_r, current_g[N_l-1], DG_g);
-    current_p[N_l] = got_mid(current_p[N_l+1], DP_r, current_p[N_l-1], DP_g);
-    current_o2[N_l] = got_mid(current_o2[N_l+1], DO2_r, current_o2[N_l-1], DO2_g);
+    current_g[N_R1] = (last_g[N_R1+1] + last_g[N_R1-1]) / 2;
+    current_p[N_R1] = (last_p[N_R1+1] + last_p[N_R1-1]) / 2;
 
 
-#current_g[grid_size] <- G_0;
-    current_g[1] <- current_g[2];
-    current_p[1] <- current_p[2];
-    current_o2[1] <- current_o2[2];
+    for(k in (N_R1+1):N_R) {
+        current_g[k] <- last_g[k] - dt * delta *(last_g[N_R1] -
+                last_g[N_R1-1])/dx_d;
+        current_p[k] <- last_p[k] - dt * delta *(last_p[N_R1] -
+                last_p[N_R1-1])/dx_d;
+    }
 
-    current_g[grid_size] <- current_g[grid_size-1];
-    current_p[grid_size] <- current_p[grid_size-1];
-    current_o2[grid_size] <- current_o2[grid_size-1];
-
-# Where put this?
-# current_1red <- 2*K2*current_2ox/K1;
 
     last_g <- current_g;
     last_p <- current_p;
-    last_o2 <- current_o2;
-    last_1red <- current_1red;
-    last_1ox <- current_1ox;
-    last_2red <- current_2red;
-    last_2ox <- current_2ox;
-
-
+    if(!(time %% 100000)) {
+        plot(points, current_g, type='o', ylim = c(0, G_0));
+        lines(points, current_p);
+    }
 }
 
-plot(deltat, current_g, type='l');
-lines(deltat, current_p, type='l');
-lines(deltat, current_o2, type='l');
+#cbind(points, current_g)
+cbind(points, current_p)
 
-current_g
-current_p
-current_1ox
-current_2ox
-current_1red
-current_2red
-current_o2
+plot(points, current_p, type='o');
 
-
-output_i <- read.table("~/Documents/de/numerical/testing/cpp/simul/Biosensor-Calculator-Library/output.dat", quote="\"", comment.char="");
-plot(output_i$V2, output_i$V1);
-lines(output_e$V2, output_e$V1);
-
-
-got_mid <- function(a_1, D1, a_2, D2) {
-    a <- (D2 * dx1 * a_1 + D1 * dx2 * a_2) /  (D2 * dx1 + D1 * dx2);
-    return(a);
-}
-
-got_dif <- function(a1, k, D, dt, dx) {
-    a <- dt * D * (a1[k + 1] - 2 * a1[k] + a1[k - 1]) / (dx^2)
-    return(a);
-}

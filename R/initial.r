@@ -33,3 +33,4 @@ DG_d <- DG_m*3;
 DP_d <- DP_m*3;
 DO2_d <- DO2_m*3;
 
+alpha <- 1;
