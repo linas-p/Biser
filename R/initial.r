@@ -1,42 +1,35 @@
-N <- 10;
-N_l <- 11;
+N <- 4;
+N_0 <- 1;
+N_R0 <- N + 1;
+N_R1 <- 2*N + 1;
+N_R <- 3*N + 1;
 
-layers<- 2;
-grid_size <- N*layers + 1;
+layers<- 3;
+grid_size <- N * layers + 1;
 R_0 <- 0.1;
-R<- 1;
-dx1<- R_0/N;
-dx2<- (R-R_0)/N;
+R_1 <- 0.12;
+R<- 0.15;
 
-deltat<- cumsum(c(0, rep(dx1, N), rep(dx2, N)));
-dt<- (min(dx1, dx2))^2/(2);
-dx_l <- c(rep(dx1, N-1), 0.05,rep(dx2, N-1));
+dx_m <- R_0 / N;
+dx_d <- (R_1-R_0) / N;
+dx_b <- (R - R_1) / N;
 
-E1RED_0 <- E2RED_0 <- 0;
+points <- cumsum(c(0, rep(dx_m, N), rep(dx_d, N), rep(dx_b, N)));
+
+dt<- (min(dx_m, dx_d, dx_b))^2/(2);
+
 P_0<- 0;
-O2_0 <- 1.2*1e-6;
-G_0 <- 1e-5;
-E1OX_0 = E2OX_0 <- 1e-9;
-KM1 <- 8*1e-5;
-KM2 <- 2*1e-5;
-#VMAX1 <- 4*1e-5;
-#VMAX2 <- 1*1e-5;
-KCAT1 <- 100;
-KCAT2 <- 100;
-K1 <- 4*1e-3;
-K2 <- 2*1e-3;
+O2_0 <- 2.5*1e-4;
+G_0 <- 1e-3;
 
-DG_r <- 2.1*1e-6;
-DP_r <- 2.1*1e-6;
-DO2_r <- 0.66*1e-5;
+KM1 <- 6.8*1e-3;
+VMAX1 <- 4*1e-5;
 
-DG_g <- 6.3*1e-6;
-DP_g <- 6.3*1e-6;
-DO2_g <- 2*1e-5;
-TIME <- 10
+DG_m <- 2.2*1e-6;
+DP_m <- 2.2*1e-6;
+DO2_m <- 0.8*1e-5;
 
-params<-c(K1, K2, KM1, KM2, KCAT1, KCAT2, dt, N,
-          P_0, G_0, O2_0, E1OX_0, E2OX_0, E1RED_0, E2RED_0,
-          1, DG_r, DO2_r, DP_r, R_0,
-          0, DG_g, DO2_g, DP_g, (R-R_0),
-          TIME);
+DG_d <- DG_m*3;
+DP_d <- DP_m*3;
+DO2_d <- DO2_m*3;
+
