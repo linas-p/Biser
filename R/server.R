@@ -8,8 +8,7 @@ result<- .Call("calculate", params);
 
 # Define server logic for slider examples
 shinyServer(function(input, output) {
-    
-    
+  
     getDt <- function(){
         dx <- min(input$d_m, input$d_d, input$d_b);
         dt <- dx^2/(2);
@@ -20,6 +19,11 @@ shinyServer(function(input, output) {
      output$text1 <- renderText({
          paste( "Estimated average time for calculations " , round(input$T/getDt()/300000*2, 2) , " (s)!" );
      	           
+     })
+     
+     output$text2 <- renderText({
+       print(paste( "--- "));
+       
      })
 
     output$System2 <- renderPlot({
@@ -52,14 +56,20 @@ shinyServer(function(input, output) {
         
         result<- .Call("calculate", params);
 
-        plot(deltat, result$G, type="l", xlab = "x(cm)", ylab="raw curves", col="blue");
+        plot(deltat, result$G, type="o", xlab = "x(cm)", ylab="raw curves", col="blue");
         
-        lines(deltat, result$P, col="red");
-        lines(deltat, result$O2, col="green");
+        lines(deltat, result$P, type="o", col="red");
+        lines(deltat, result$O2, type="o", col="green");
         
         
         legend("bottomright",legend=c("G", "P", "O_2"),
-               text.col=c("blue","red", "green"), col=c("blue","red", "green"))
+               text.col=c("blue","red", "green"), col=c("blue","red", "green"));
+        
+        print(paste( " ", result$G, "\n"));
+        print(paste( " ", result$P, "\n"));
+        print(paste( " ", result$O2, "\n"));
+        
+        
         
     })
 
@@ -85,16 +95,14 @@ shinyServer(function(input, output) {
         
         result<- .Call("calculate", params);
 
-        plot(deltat, result$G/input$g_0, ylim= c(0,1), type="l", xlab = "x(cm)", ylab="normalized (0,1)", col="blue");
+        plot(deltat, result$G/(input$g_0 * 1e-3), type="o", ylim= c(0,1),  xlab = "x(cm)", ylab="normalized (0,1)", col="blue");
         
-        lines(deltat, result$P/max(result$P), col="red");
-        lines(deltat, result$O2/input$o2_0, col="green");
+        lines(deltat, result$P/max(result$P), type="o", col="red");
+        lines(deltat, result$O2/(input$o2_0 * 1e-4), type="o", col="green");
         
         
         legend("bottomright",legend=c("G", "P", "O_2"),
         text.col=c("blue","red", "green"), col=c("blue","red", "green"))
-
-
 
     })
 })

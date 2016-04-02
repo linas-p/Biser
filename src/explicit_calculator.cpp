@@ -132,9 +132,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 		mm_g = MM(last_g, 0, v_max1, km1);
 
         // Kraštinė substrato nepratekėjimo sąlyga centre r = 0.
-        current_g[N_0]  = last_g[N_0]  -  dt * (Dg * LaplacePolar0(last_g, dr)   - mm_g);
+        current_g[N_0]  = last_g[N_0]  +  dt * (Dg * LaplacePolar0(last_g, dr)   - mm_g);
         current_pr[N_0] = last_pr[N_0] +  dt * (Dpr * LaplacePolar0(last_pr, dr) + mm_g);
-        current_o2[N_0] = last_o2[N_0] -  dt * (Do2 * LaplacePolar0(last_o2, dr) - mm_g);
+        current_o2[N_0] = last_o2[N_0] +  dt * (Do2 * LaplacePolar0(last_o2, dr) - mm_g);
 
 		//
 		// Skaičiuojame sluoksnyje 0 < r < R_0
@@ -176,6 +176,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         Dg  = bio_info->layers[DIFFUSION].Dg;
         Dpr = bio_info->layers[DIFFUSION].Dpr;
         Do2 = bio_info->layers[DIFFUSION].Do2;
+        dr = space_steps[DIFFUSION];
 
 		// Skaičiuojame sluoksnyje R_0 < r < R_1
         for (a = N_R0 + 1; a < N_R1; a++) {
@@ -214,15 +215,14 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         Dg  = bio_info->layers[BAUDARY].Dg;
         Dpr = bio_info->layers[BAUDARY].Dpr;
         Do2 = bio_info->layers[BAUDARY].Do2;
-
-        dr0 = space_steps[BAUDARY];
+        dr = space_steps[BAUDARY];
 
 		// Skaičiuojame sluoksnyje R_1 < r <= R
         for (a = N_R1 + 1; a < N_R + 1; a++) {
                 // Įskaičiuojama difuzijos įtaka
-                current_g[a]  = last_g[a]  -  dt * Dg  * delta_inverse * (last_g[N_R1]  - last_g[N_R1-1])/dr0;
-                current_pr[a] = last_pr[a] -  dt * Dpr * delta_inverse * (last_pr[N_R1] - last_pr[N_R1-1])/dr0;
-                current_o2[a] = last_o2[a] -  dt * Do2 * delta_inverse * (last_o2[N_R1] - last_o2[N_R1-1])/dr0;
+                current_g[a]  = last_g[a]  -  dt * Dg  * delta_inverse * (last_g[N_R1]  - last_g[N_R1-1])/dr;
+                current_pr[a] = last_pr[a] -  dt * Dpr * delta_inverse * (last_pr[N_R1] - last_pr[N_R1-1])/dr;
+                current_o2[a] = last_o2[a] -  dt * Do2 * delta_inverse * (last_o2[N_R1] - last_o2[N_R1-1])/dr;
         }
 
         // Masyvai sukeičiami vietomis
@@ -237,15 +237,15 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
         // Spausdinami rezultatai
         if ((t % PRINT_RATE) == 0) {
-            printf("start %d %s \n", t, out_file_name);
+            //printf("start %d %s \n", t, out_file_name);
             if(write_to_file) {
                 output_file = fopen(out_file_name, "a");
                 fprintf(output_file, "%e \n", execution_time);
                 fclose(output_file);
             }
-            printf("start: %d, %f \n", t, execution_time);
-            if (callback_crunched != NULL)
-                callback_crunched(ptr, t);
+            printf("simulated: %f \n", execution_time);
+            //if (callback_crunched != NULL)
+            //    callback_crunched(ptr, t);
         }
 
         // Nustatoma ar tęsti simuliaciją
