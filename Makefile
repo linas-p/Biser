@@ -21,7 +21,7 @@ SRC_DIR = ./src
 #JSON_INC =./external/json/src
 
 %.o : %.cpp
-	PKG_CPPFLAGS="-fPIC -shared $(RCPPFLAGS) $(RCPPINCL) -I$(INC_DIR)/" PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS)" R CMD SHLIB $<
+	PKG_CPPFLAGS="-fPIC -shared -O2 $(RCPPFLAGS) $(RCPPINCL) -I$(INC_DIR)/" PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS)" R CMD SHLIB $<
 #PKG_CPPFLAGS="-std=c++11 -fPIC -shared $(RCPPFLAGS) $(RCPPINCL) -I$(JSON_INC) -I$(INC_DIR)/" PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS)" R CMD SHLIB $<
 
 cpp_sources := $(wildcard $(SRC_DIR)/*.cpp ./calculator_r.cpp)
@@ -36,6 +36,6 @@ clean:
 	rm -rf $(BUILD_DIR) calculator calculator_r.o calculator_r.so a.out \
 		$(SRC_DIR)/explicit_calculator.o $(SRC_DIR)/utils.o testing.o \
 		$(SRC_DIR)/explicit_calculator.so $(SRC_DIR)/utils.o testing.so \
-		calculator.so
+		calculator.so $(SRC_DIR)/utils.so
 
 .PHONY: all cmake clean test

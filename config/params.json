@@ -1,38 +1,37 @@
 {
   "n": 100,
-  "dt": 1e-4,
   "equations_params": {
   	"t": 20,
     "km_1": 6.8e-3,
-    "km_2": 3.5e-4,
-    "k1": 100,
-    "k2": 100,
-    "kcat1": 100,
-    "kcat2": 100
+    "vmax1": 4e-5
   },
   "initial_conditions": {
     "product_0": 0,
     "glucose_0": 1e-3,
-    "oxygen_0": 2.5e-4,
-    "e1_oxi_0": 4e-7,
-    "e1_red_0": 0,
-    "e2_oxi_0": 4e-7,
-    "e2_red_0": 0
+    "oxygen_0": 2.5e-4
   },
+  "alpha": 0.5,
   "layers": {
     "layer1": {
       "enzyme": 1,
       "Diff_product": 2.2e-6,
       "Diff_glucose": 2.2e-6,
       "Diff_oxygen": 0.8e-5,
-      "layer_length": 0.1
+      "layer_length": 10
     },
     "layer2": {
       "enzyme": 0,
-      "Diff_product": 6.7e-6,
-      "Diff_glucose": 6.7e-6,
+      "Diff_product": 6.6e-6,
+      "Diff_glucose": 6.6e-6,
       "Diff_oxygen": 2.4e-5,
-      "layer_length": 0.9
+      "layer_length": 2
+    },
+    "layer3": {
+      "enzyme": 0,
+      "Diff_product": 6.6e-6,
+      "Diff_glucose": 6.6e-6,
+      "Diff_oxygen": 2.4e-5,
+      "layer_length": 3
     }
   }
 }

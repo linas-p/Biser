@@ -16,9 +16,10 @@ void swap_arrays(double **array1, double **array2) {
     *array2 = temp;
 }
 
-void fill_array(double *array, int length, double value, int from) {
-    for (int a = from; a < length; a++)
+void FillArray(double *array, double value, int from, int to) {
+    for (int a = from; a < to + 1; a++) {
         array[a] = value;
+    }
 }
 
 void condition_assing(double *array1, double *array2, int length, \
@@ -27,14 +28,14 @@ void condition_assing(double *array1, double *array2, int length, \
         array1[a] = array2[a]*value;
 }
 
-void print_array(double *array, int length) {
+void PrintArray(double *array, int length) {
     int a;
 
     printf("--- \n");
     for (a = 0; a < length; a++)
         printf(" %.10f", array[a]);
 
-    printf("--- \n");
+    printf("\n--- \n");
     fflush(stdout);
 }
 

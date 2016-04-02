@@ -30,13 +30,12 @@ struct layer_params {
 
 struct bio_params {
 
-    // Reakcijos greičio konstanta k2 (s^-1)
-    double k1, k2;
     // Pusiausvyros konstantos (mol/cm^3)
     double km1, km2;
+	double alpha;
 
-	double kcat1, kcat2;
-    // double vmax1, vmax2;
+	//double kcat1, kcat2;
+    double vmax1, vmax2;
 
     // Žingsnis pagal laiką (s)
     double dt;
@@ -58,10 +57,7 @@ struct bio_params {
     double pr_0;
     double g_0;
     double o2_0;
-    double e1ox_0;
-    double e2ox_0;
-    double e1red_0;
-    double e2red_0;
+
     // Biojutiklio sluoksnių skaičius
     int layer_count;
 

@@ -18,11 +18,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                           void (*callback_crunched)(void *, int),
                           std::vector<double> * P,\
                           std::vector<double> * G,\
-                          std::vector<double> * O2,\
-                          std::vector<double> * Ox1,\
-                          std::vector<double> * Ox2,\
-                          std::vector<double> * Red1,\
-                          std::vector<double> * Red2
+                          std::vector<double> * O2
                          ) {
     int a;
 
@@ -63,10 +59,6 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     bool write_to_file = bio_info->write_to_file;
 
     // Sukuriami lokalūs kintamieji dėl optimizavimo
-    double k1                    = bio_info->k1;
-    double k2                    = bio_info->k2;
-    double kcat1                    = bio_info->kcat1;
-    double kcat2                    = bio_info->kcat2;
     double km1                    = bio_info->km1;
     double km2                    = bio_info->km2;
     double dt                    = bio_info->dt;
@@ -75,11 +67,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double min_t                 = bio_info->min_t;
     double resp_t                = bio_info->resp_t;
     char *out_file_name          = bio_info->out_file_name;
-    double e1ox_0                = bio_info->e1ox_0;
-    double e2ox_0                = bio_info->e2ox_0;
     double o2_0                  = bio_info->o2_0;
     double g_0                  = bio_info->g_0;
-
+	double alpha                 = bio_info->alpha;
     int layer_count              = bio_info->layer_count;
     int enz_layer;
 
@@ -88,8 +78,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double Do2, Do20, Do21;
 
     double dr, dr0, dr1;
-    //double v_max1                  = bio_info->vmax1;
-    //double v_max2                  = bio_info->vmax2;
+    double v_max1                  = bio_info->vmax1;
+    double v_max2                  = bio_info->vmax2;
+	int16_t N_0 = 0, N_R0 = n, N_R1 = 2 * n, N_R = 3 * n;
 
     // Sukuriamas rezultatų saugojimui skirtas failas
     if(write_to_file) {
@@ -108,31 +99,19 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     *last_pr = new double[point_count];
     double *current_o2 = new double[point_count],
     *last_o2 = new double[point_count];
-    double *current_1red = new double[point_count],
-    *last_1red = new double[point_count];
-    double *current_2red = new double[point_count],
-    *last_2red = new double[point_count];
-    double *current_1ox = new double[point_count],
-    *last_1ox = new double[point_count];
-    double *current_2ox = new double[point_count],
-    *last_2ox = new double[point_count];
 
 
     // Priskiriamos pradinės ir kai kurios kraštinės sąlygos
-    fill_array(last_1ox, point_count, e1ox_0, 0);  //  not nessisary hole array
-    fill_array(last_2ox, point_count, e2ox_0, 0);
-    fill_array(last_1red, point_count, 0, 0);
-    fill_array(last_2red, point_count, 0, 0);
-    fill_array(last_pr, point_count, 0, 0);
-    fill_array(last_o2, point_count, o2_0, 0);
-    fill_array(last_g, point_count, 0, 0);
-    fill_array(last_g, point_count, g_0, n);
+    FillArray(last_pr, 0, N_0, N_R);
+    FillArray(last_o2, o2_0, N_0, N_R);
+    FillArray(last_o2, alpha*o2_0, N_0, N_R0);
+    FillArray(last_g, 0, N_0, N_R);
+    FillArray(last_g, g_0, N_R0 + 1, N_R);
 
     // Kiekvienam sluoksniui apskaičiuojami žingsniai pagal erdvę
     space_steps = new double[layer_count];
     for (a = 0; a < layer_count; a++)
         space_steps[a] = bio_info->layers[a].d / n;
-
 
 	std::clock_t start = std::clock();
     printf("start\n");
@@ -147,6 +126,12 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         Do2 = bio_info->layers[layer].Do2;
 
         dr = space_steps[layer];
+
+		kinetics_partg = v_max1 * last_g[0]/(km1 + last_g[0]);;
+        // Kraštinė substrato nepratekėjimo sąlyga
+        current_g[0] = last_g[0] -  dt * Dg * 2 * (last_g[1] - last_g[0]) / (dr * dr) - kinetics_partg;
+        current_pr[0] = last_pr[0] +  dt * Dg * 2 * (last_pr[1] - last_pr[0]) / (dr * dr) + kinetics_partg;
+        current_o2[0] = last_o2[0] -  dt * Dg * 2 * (last_o2[1] - last_o2[0]) / (dr * dr) - kinetics_partg;
 
         for (a = 1; a < point_count - 1; a++) {
             // Nustatome ar tai nėra sluoksnių sandūra
@@ -167,39 +152,29 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             } else {
                 // Įskaičiuojama difuzijos įtaka
                 current_g[a] = dt * Dg * ((last_g[a + 1] - 2 * last_g[a] + last_g[a - 1]) / (dr * dr) +
-					  (last_g[a + 1] - last_g[a - 1]) / (a * 2 * dr * dr))+
+					  2 * (last_g[a + 1] - last_g[a]) / (a * dr * dr))+
                                last_g[a];
                 current_pr[a] = dt * Dpr * ((last_pr[a + 1] - 2 * last_pr[a] + last_pr[a - 1]) / (dr * dr) +
-					  (last_pr[a + 1] - last_pr[a - 1]) / (a * 2 * dr * dr))+
+					  2 * (last_pr[a + 1] - last_pr[a]) / (a * dr * dr))+
                                 last_pr[a];
 
                 current_o2[a] = dt * Do2 * ((last_o2[a + 1] - 2 * last_o2[a] + last_o2[a - 1]) / (dr * dr) +
-					  (last_o2[a + 1] - last_o2[a - 1]) / (a * 2 * dr * dr))+
+					  2 * (last_o2[a + 1] - last_o2[a]) / (a * dr * dr))+
                                 last_o2[a];
 
 
                 // Jeigu sluoksnis yra fermentinis,
                 // tuomet prisideda ir kinetikos dalis
                 if (enz_layer) {
-                    current_1ox[a] = dt * 2 * k1 * last_1red[a] + last_1ox[a];
-                    current_1red[a] = -dt * 2 * k1 * last_1red[a] + \
-                                      last_1red[a];
-                    current_2ox[a] = -dt * 2 * k2 * last_1red[a] + last_2ox[a];
-                    current_2red[a] = dt * 2 * k2 * last_1red[a] + last_2red[a];
-
-                    kinetics_partg = dt * e1ox_0 * kcat1 * last_g[a] / \
+                    kinetics_partg = dt  * v_max1 * last_g[a] / \
                                      (last_g[a]+km1);
-                    kinetics_parto2 = dt * e2ox_0 * kcat2 * last_o2[a] / \
+                    //kinetics_parto2 = dt  * v_max2 * last_o2[a] / \
                                       (last_o2[a]+km2);
 
                     current_g[a] -=    kinetics_partg;
                     current_pr[a] +=   kinetics_partg;
-                    current_1ox[a] -=  kinetics_partg;
-                    current_1red[a] += kinetics_partg;
-
-                    current_2ox[a] +=   kinetics_parto2;
-                    current_2red[a] -=  kinetics_parto2;
-                    current_o2[a] -=    kinetics_parto2;
+                    //current_o2[a] -=    kinetics_parto2;
+                    current_o2[a] -=    kinetics_partg;
                 }
             }
         }
@@ -222,6 +197,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
             dr1 = space_steps[layer + 1];
 
+    printf("dx: %f, %f, %f, %f, %f, %f \n", Dg0, Dg1, dr0, dr1, current_g[a + 1], current_g[a - 1]);
+    fflush(stdout);
             current_g[a] = (Dg1 * dr0 * current_g[a + 1] + \
                             Dg0 * dr1 * current_g[a - 1]) / \
                            (Dg1 * dr0 + Dg0 * dr1);
@@ -233,10 +210,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                             (Do21 * dr0 + Do20 * dr1);
         }
 
-        // Kraštinė substrato nepratekėjimo sąlyga
-        current_g[0] = last_g[0] -  dt * Dg * 4 * (last_g[1] - last_g[0]) / (dr * dr) + k1 * last_g[0]/(km1 + last_g[0]);
-        current_pr[0] = last_pr[0] +  dt * Dg * 4 * (last_pr[1] - last_pr[0]) / (dr * dr) + k1 * last_pr[0]/(km1 + last_pr[0]);
-        current_o2[0] = last_o2[0] -  dt * Dg * 4 * (last_o2[1] - last_o2[0]) / (dr * dr) + k2 * last_o2[0]/(km2 + last_o2[0]);
+
+
 
         current_g[point_count - 1] = current_g[point_count - 2];
         current_pr[point_count - 1] = current_pr[point_count - 2];
@@ -249,19 +224,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         di = fabs(i - last_i);
         last_i = i;
 
-        // TODO(linas): Combine oxygen and glucose.
-        // condition_assing(current_1red, current_2ox,
-        // point_count - 1, 2*k2/k1);
-
-
-
         // Masyvai sukeičiami vietomis
         swap_arrays(&current_g, &last_g);
         swap_arrays(&current_pr, &last_pr);
-        swap_arrays(&current_1ox, &last_1ox);
-        swap_arrays(&current_2ox, &last_2ox);
-        swap_arrays(&current_1red, &last_1red);
-        swap_arrays(&current_2red, &last_2red);
         swap_arrays(&current_o2, &last_o2);
 
 
@@ -278,9 +243,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                 fprintf(output_file, "%e %e \n", i, execution_time);
                 fclose(output_file);
             }
-            printf("start %d \n", t);
+            printf("start: %d, %f \n", t, execution_time);
             if (callback_crunched != NULL)
-                callback_crunched(ptr, execution_time);
+                callback_crunched(ptr, t);
         }
 
         // Nustatoma ar tęsti simuliaciją
@@ -314,30 +279,20 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         fprintf(output_file, "%e %e\n", i, execution_time);
         fclose(output_file);
     }
+    printf("start: %d, %f \n", t, execution_time);
+    fflush(stdout);
     if (callback_crunched != NULL)
-        callback_crunched(ptr, execution_time);
+        callback_crunched(ptr, t);
 
-    concatenate_vals( last_g, G, point_count);
-    concatenate_vals( last_pr, P, point_count);
-    concatenate_vals( last_o2, O2, point_count);
-    concatenate_vals( last_1ox, Ox1, point_count);
-    concatenate_vals( last_2ox, Ox2, point_count);
-    concatenate_vals( last_1red, Red1, point_count);
-    concatenate_vals( last_2red, Red2, point_count);
+    concatenate_vals(last_g, G, point_count);
+    concatenate_vals(last_pr, P, point_count);
+    concatenate_vals(last_o2, O2, point_count);
 
     // Atlaisvinama atmintis
     free(current_g);
     free(last_g);
     free(current_pr);
     free(last_pr);
-    free(current_1ox);
-    free(last_1ox);
-    free(current_2ox);
-    free(last_2ox);
-    free(current_1red);
-    free(last_1red);
-    free(current_2red);
-    free(last_2red);
     free(current_o2);
     free(last_o2);
 
