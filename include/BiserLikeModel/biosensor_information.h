@@ -15,6 +15,13 @@ enum resp_method {
     FIXED_TIME     // 2 - fiksuotas laikas
 };
 
+enum layer {
+    MICROREACTOR,  // 0 - Mikro-reaktoriaus sluoksnis(Difuzija+MM)
+    DIFFUSION,     // 1 - Difuzijos sluoksnis(Difuzija)
+    BAUDARY        // 2 - Isorinis sluoksnis salytis su isore
+};
+
+
 struct layer_params {
     // Laukas nurodo ar tai fermento sluoksnis
     int enz_layer;

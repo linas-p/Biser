@@ -17,21 +17,21 @@
       "Diff_product": 2.2e-6,
       "Diff_glucose": 2.2e-6,
       "Diff_oxygen": 0.8e-5,
-      "layer_length": 10
+      "layer_length": 0.10
     },
     "layer2": {
       "enzyme": 0,
       "Diff_product": 6.6e-6,
       "Diff_glucose": 6.6e-6,
       "Diff_oxygen": 2.4e-5,
-      "layer_length": 2
+      "layer_length": 0.02
     },
     "layer3": {
       "enzyme": 0,
       "Diff_product": 6.6e-6,
       "Diff_glucose": 6.6e-6,
       "Diff_oxygen": 2.4e-5,
-      "layer_length": 3
+      "layer_length": 0.03
     }
   }
 }

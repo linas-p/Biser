@@ -6,9 +6,9 @@ N_R <- 3*N + 1;
 
 layers<- 3;
 grid_size <- N * layers + 1;
-R_0 <- 10;
-R_1 <- 12;
-R<- 15;
+R_0 <- 0.10;
+R_1 <- 0.12;
+R<- 0.15;
 
 dx_m <- R_0 / N;
 dx_d <- (R_1-R_0) / N;
@@ -44,5 +44,5 @@ alpha,
 1, DG_m, DO2_m, DP_m, 10,
 0, DG_d, DO2_d, DP_d, 2,
 0, DG_d, DO2_d, DP_d, 3,
-dt
+dt*100000
 );

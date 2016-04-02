@@ -133,7 +133,7 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->layers[0].Do2 = 0.8 * 1e-5;
     bio_info->layers[0].Dpr = 2.2 * 1e-6;
     // [um] -> [cm]
-    bio_info->layers[0].d = 10;
+    bio_info->layers[0].d = 0.10;
 
     // 1
     bio_info->layers[1].enz_layer = 0;
@@ -142,7 +142,7 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->layers[1].Do2 = 2.4 * 1e-5;
     bio_info->layers[1].Dpr = 6.8 * 1e-6;
     // [um] -> [cm]
-    bio_info->layers[1].d = 2;
+    bio_info->layers[1].d = 0.02;
 
     // 2
     bio_info->layers[2].enz_layer = 0;
@@ -151,7 +151,7 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->layers[2].Do2 = 2.4 * 1e-5;
     bio_info->layers[2].Dpr = 6.8 * 1e-6;
     // [um] -> [cm]
-    bio_info->layers[2].d = 3;
+    bio_info->layers[2].d = 0.03;
 }
 
 int main() {

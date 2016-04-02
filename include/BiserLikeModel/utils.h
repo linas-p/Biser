@@ -10,7 +10,11 @@
 #include <vector>
 
 namespace BiserLikeModel {
-void swap_arrays(double **array1, double **array2);
+double LaplacePolar(double *array, int k, double dr, double r);
+double LaplacePolar0(double *array, double dr);
+double MM(double *array, int k, double vmax, double km);
+
+void SwapArrays(double **array1, double **array2);
 void condition_assing(double *array1, double *array2, int length, double value);
 
 void FillArray(double *array, double value, int from, int to);

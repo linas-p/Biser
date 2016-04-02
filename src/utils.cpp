@@ -8,7 +8,24 @@
 
 namespace BiserLikeModel {
 
-void swap_arrays(double **array1, double **array2) {
+double LaplacePolar(double *array, int k, double dr, double r) {
+    double val = (array[k+1] - 2 * array[k] + array[k-1])/(dr*dr) 
+   + (1/r)* (array[k+1] - array[k-1])/(dr);
+    return val;
+
+}
+
+double LaplacePolar0(double *array, double dr) {
+    double val = 2*(array[1] - array[0])/(dr*dr);
+    return val;
+}
+
+double MM(double *array, int k, double vmax, double km) {
+    double val = vmax*array[k]/(km+array[k]);
+    return val;
+}
+
+void SwapArrays(double **array1, double **array2) {
     double *temp;
 
     temp = *array1;
