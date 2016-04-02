@@ -1,12 +1,12 @@
 source("initial.r");
 
 last_g <- rep(0, grid_size);
-last_g[(N_R0+1):grid_size] <- G_0;
+last_g[(N_R0p):grid_size] <- G_0;
 
 last_p <- rep(0, grid_size);
 
 last_o2 <- rep(O2_0, grid_size);
-last_o2[N_0:N_R0] <- alpha * O2_0;
+last_o2[N_0:N_R0m] <- alpha * O2_0;
 
 current_g <- rep(-1, grid_size);
 current_p <- rep(-1, grid_size);
@@ -15,7 +15,7 @@ current_o2 <- rep(-1, grid_size);
 delta <- 1/((R^3-R_1^3)/(3*R_1^2));
 
 
-for(time in 1:100000) {
+for(time in 1:1000000) {
 
     kinetics_partg <- MM(last_g, 1, VMAX1 , KM1);
     current_g[1] <- last_g[1] + dt * (DG_m * LaplacePolar0(last_g, dx_m) - kinetics_partg);
@@ -23,26 +23,34 @@ for(time in 1:100000) {
     current_o2[1] <- last_o2[1] + dt * (DO2_m * LaplacePolar0(last_o2, dx_m) - kinetics_partg);
 
     
-    for(k in 2:(N_R0-1)) {
+    for(k in 2:(N_R0m-1)) {
         kinetics_partg <- MM(last_g, k, VMAX1 , KM1);
         current_g[k] <- last_g[k] + dt * (DG_m * LaplacePolar(last_g, k, dx_m, points[k]) - kinetics_partg);
         current_p[k] <- last_p[k] + dt * (DP_m * LaplacePolar(last_p, k, dx_m, points[k]) + kinetics_partg);
         current_o2[k] <- last_o2[k] + dt * (DO2_m * LaplacePolar(last_o2, k, dx_m, points[k]) - kinetics_partg);
     }
 
-
-
-    current_g[N_R0] = (DG_d * dx_m * last_g[N_R0+1] +
-                       DG_m * dx_d * last_g[N_R0-1]) /
-                      (DG_d * dx_m + DG_m * dx_d);
-    current_p[N_R0] = (DP_d * dx_m * last_p[N_R0+1] +
-                       DP_m * dx_d * last_p[N_R0-1]) /
-                      (DP_d * dx_m + DP_m * dx_d);
-    current_o2[N_R0] = (DO2_d * dx_m * last_o2[N_R0+1] +
-                        DO2_m * dx_d * last_o2[N_R0-1]) /
-                       (DO2_d * dx_m + DO2_m * dx_d);
-
-    for(k in (N_R0+1):(N_R1-1)) {
+    current_g[N_R0m] = alpha * (DG_d * dx_m  * last_g[N_R0p+1] +
+                       DG_m * dx_d * last_g[N_R0m-1]) /
+                      (DG_d * dx_m + alpha * DG_m * dx_d);
+    current_p[N_R0m] = alpha * (DP_d * dx_m  * last_p[N_R0p+1] +
+                      DP_m * dx_d * last_p[N_R0m-1]) /
+                      (DP_d * dx_m + alpha * DP_m * dx_d);
+    current_o2[N_R0m] = alpha * (DO2_d * dx_m  * last_o2[N_R0p+1] +
+                        DO2_m * dx_d * last_o2[N_R0m-1]) /
+                       (DO2_d * dx_m + alpha * DO2_m * dx_d);
+    current_g[N_R0p] = (DG_d * dx_m * last_g[N_R0p+1] +
+                       DG_m * dx_d * last_g[N_R0m-1]) /
+                      (DG_d * dx_m + alpha * DG_m * dx_d);
+    current_p[N_R0p] = (DP_d * dx_m * last_p[N_R0p+1] +
+                      DP_m * dx_d  * last_p[N_R0m-1]) /
+                      (DP_d * dx_m + alpha * DP_m * dx_d);
+    current_o2[N_R0p] = (DO2_d * dx_m * last_o2[N_R0p+1] +
+                        DO2_m * dx_d  * last_o2[N_R0m-1]) /
+                       (DO2_d * dx_m + alpha * DO2_m * dx_d);
+    
+    
+    for(k in (N_R0p+1):(N_R1-1)) {
         current_g[k] <- last_g[k] + dt * DG_d * LaplacePolar(last_g, k, dx_d, points[k]);
         current_p[k] <- last_p[k] + dt * DP_d * LaplacePolar(last_p, k, dx_d, points[k]);
         current_o2[k] <- last_o2[k] + dt * DO2_d * LaplacePolar(last_o2, k, dx_d, points[k]);

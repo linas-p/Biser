@@ -17,7 +17,7 @@ shinyServer(function(input, output) {
     }
     
      output$text1 <- renderText({
-         paste( "Estimated average time for calculations " , round(input$T/getDt()/300000*2, 2) , " (s)!" );
+         paste( "Estimated average time for calculations " , round(input$T/getDt()/300000*2/(30/input$n), 2) , " (s)!" );
      	           
      })
      
@@ -40,7 +40,7 @@ shinyServer(function(input, output) {
         dx2<- input$d_d/input$n;
         dx3<- input$d_b/input$n;
         
-        deltat<- cumsum(c(0, rep(dx1, input$n), rep(dx2, input$n), rep(dx3, input$n)));
+        deltat<- cumsum(c(0, rep(dx1, input$n), 0, rep(dx2, input$n), rep(dx3, input$n)));
 
         params<- c(
             input$km_1 * 1e-3, input$km_1 * 1e-3,
@@ -65,11 +65,12 @@ shinyServer(function(input, output) {
         legend("bottomright",legend=c("G", "P", "O_2"),
                text.col=c("blue","red", "green"), col=c("blue","red", "green"));
         
-        print(paste( " ", result$G, "\n"));
-        print(paste( " ", result$P, "\n"));
-        print(paste( " ", result$O2, "\n"));
-        
-        
+        #print(paste( " ", result$G, "\n"));
+        #print(paste( " ", result$P, "\n"));
+        #print(paste( " ", result$O2, "\n"));
+        print(paste("<- " , result$G[5]/result$G[6]));
+        print(paste("<- " , result$P[5]/result$P[6]));
+        print(paste("<- " , result$O2[5]/result$O2[6]));
         
     })
 
@@ -79,7 +80,7 @@ shinyServer(function(input, output) {
         dx2<- input$d_d/input$n;
         dx3<- input$d_b/input$n;
         
-        deltat<- cumsum(c(0, rep(dx1, input$n), rep(dx2, input$n), rep(dx3, input$n)));
+        deltat<- cumsum(c(0, rep(dx1, input$n), 0, rep(dx2, input$n), rep(dx3, input$n)));
      
         params<- c(
             input$km_1 * 1e-3, input$km_1 * 1e-3,

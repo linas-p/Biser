@@ -60,6 +60,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double o2_0                  = bio_info->o2_0;
     double g_0                  = bio_info->g_0;
 	double alpha                 = bio_info->alpha;
+    double alpha_inverse = 1/alpha;
     int layer_count              = bio_info->layer_count;
 
     double Dg, Dg0, Dg1;
@@ -69,7 +70,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double dr, dr0, dr1;
     double v_max1                  = bio_info->vmax1;
     //  double v_max2                  = bio_info->vmax2;
-	int16_t N_0 = 0, N_R0 = n, N_R1 = 2 * n, N_R = 3 * n;
+//	int16_t N_0 = 0, N_R0 = n, N_R1 = 2 * n, N_R = 3 * n;
+	int16_t N_0 = 0, N_R0m = n, N_R0p = n + 1, N_R1 = 2 * n + 1, N_R = 3 * n + 1;
 
     // Sukuriamas rezultatų saugojimui skirtas failas
     if(write_to_file) {
@@ -77,7 +79,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         fclose(output_file);
     }
     // Apskaičiuojamas tinklo taškų skaičius per visus biojutiklio sluoksnius
-    point_count = layer_count * n + 1;
+    point_count = layer_count * n + 2;
     printf("start ini %d \n", point_count);
     fflush(stdout);
 
@@ -97,22 +99,36 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     // Priskiriamos pradinės ir kai kurios kraštinės sąlygos
     FillArray(last_pr, 0, N_0, N_R);
     FillArray(last_o2, o2_0, N_0, N_R);
-    FillArray(last_o2, alpha*o2_0, N_0, N_R0);
+    FillArray(last_o2, alpha*o2_0, N_0, N_R0m);
     FillArray(last_g, 0, N_0, N_R);
-    FillArray(last_g, g_0, N_R0 + 1, N_R);
+    FillArray(last_g, g_0, N_R0p, N_R);
+    //PrintArray(last_g, point_count);
+    //PrintArray(last_o2, point_count);
 
     // Kiekvienam sluoksniui apskaičiuojami žingsniai pagal erdvę
     space_steps = new double[layer_count];
     space_points = new double[point_count];
-    space_points[N_R0] = 0;
+    space_points[N_0] = 0.;
 
     for (a = 0; a < layer_count; a++){
-        space_steps[a] = bio_info->layers[a].d / n;
+        space_steps[a] = bio_info->layers[a].d / n;  
+    }
+
+
+    int j;
+    for(j = 1; j < N_R0p; j++){
+        space_points[j] = space_points[j-1] + space_steps[0];
+        //printf("<-%d, %f\n", j, space_points[j]);
+    }    
+    space_points[N_R0p] = space_points[N_R0m];
+    for (a = 1; a < layer_count; a++){
         int j;
-        for(j = a*n+1; j < a*n+1+n; j++){
+        for(j = a*n+2; j < a*n+2+n; j++){
             space_points[j] = space_points[j-1] + space_steps[a];
+            //printf("<-%d, %f\n", j, space_points[j]);
         }    
     }
+    //PrintArray(space_points, point_count);
 
 	double delta_inverse = 1/((pow(bio_info->layers[BAUDARY].d, 3) - pow(bio_info->layers[DIFFUSION].d, 3))/(3 * pow(bio_info->layers[DIFFUSION].d, 2)));
 
@@ -138,7 +154,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
 		//
 		// Skaičiuojame sluoksnyje 0 < r < R_0
-        for (a = N_0 + 1; a < N_R0; a++) {
+        for (a = N_0 + 1; a < N_R0m; a++) {
 	            mm_g = MM(last_g, a, v_max1, km1);
                 // Įskaičiuojama difuzijos įtaka
                 current_g[a]  = last_g[a]  + dt * (Dg * LaplacePolar(last_g, a, dr, space_points[a])   - mm_g);
@@ -160,15 +176,25 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             Do21 = bio_info->layers[DIFFUSION].Do2;
             dr1 = space_steps[DIFFUSION];
 
-            current_g[N_R0] = (Dg1 * dr0 * last_g[N_R0 + 1] + \
-                            Dg0 * dr1 * last_g[N_R0 - 1]) / \
-                           (Dg1 * dr0 + Dg0 * dr1);
-            current_pr[N_R0] = (Dpr1 * dr0 * last_pr[N_R0 + 1] + \
-                             Dpr0 * dr1 * last_pr[N_R0 - 1]) / \
-                            (Dpr1 * dr0 + Dpr0 * dr1);
-            current_o2[N_R0] = (Do21 * dr0 * last_o2[N_R0 + 1] + \
-                             Do20 * dr1 * last_o2[N_R0 - 1]) / \
-                            (Do21 * dr0 + Do20 * dr1);
+            current_g[N_R0m] = alpha * (Dg1 * dr0 * last_g[N_R0p + 1] + \
+                            Dg0 * dr1 * last_g[N_R0m - 1]) / \
+                           (Dg1 * dr0 + alpha * Dg0 * dr1);
+            current_pr[N_R0m] = alpha_inverse * (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
+                             Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
+                            (Dpr1 * dr0 + alpha_inverse * Dpr0 * dr1);
+            current_o2[N_R0m] = alpha * (Do21 * dr0 * last_o2[N_R0p + 1] + \
+                             Do20 * dr1 * last_o2[N_R0m - 1]) / \
+                            (Do21 * dr0 + alpha * Do20 * dr1);
+
+            current_g[N_R0p] = (Dg1 * dr0 * last_g[N_R0p + 1] + \
+                            Dg0 * dr1 * last_g[N_R0m - 1]) / \
+                           (Dg1 * dr0 + alpha * Dg0 * dr1);
+            current_pr[N_R0p] = (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
+                             Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
+                            (Dpr1 * dr0 + alpha_inverse * Dpr0 * dr1);
+            current_o2[N_R0p] = (Do21 * dr0 * last_o2[N_R0p + 1] + \
+                             Do20 * dr1 * last_o2[N_R0m - 1]) / \
+                            (Do21 * dr0 + alpha * Do20 * dr1);
         }
 
 
@@ -179,7 +205,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         dr = space_steps[DIFFUSION];
 
 		// Skaičiuojame sluoksnyje R_0 < r < R_1
-        for (a = N_R0 + 1; a < N_R1; a++) {
+        for (a = N_R0p + 1; a < N_R1; a++) {
                 // Įskaičiuojama difuzijos įtaka
                 current_g[a]  = last_g[a]  + dt * Dg * LaplacePolar(last_g, a, dr, space_points[a]);
                 current_pr[a] = last_pr[a] + dt * Dpr * LaplacePolar(last_pr, a, dr, space_points[a]);

@@ -1,11 +1,14 @@
 N <- 4;
 N_0 <- 1;
-N_R0 <- N + 1;
-N_R1 <- 2*N + 1;
-N_R <- 3*N + 1;
+N_R0m <- N + 1;
+N_R0p <- N + 2;
+
+N_R1 <- 2*N + 2;
+N_R <- 3*N + 2;
 
 layers<- 3;
-grid_size <- N * layers + 1;
+grid_size <- N * layers + 2;
+
 R_0 <- 0.10;
 R_1 <- 0.12;
 R<- 0.15;
@@ -14,7 +17,7 @@ dx_m <- R_0 / N;
 dx_d <- (R_1-R_0) / N;
 dx_b <- (R - R_1) / N;
 
-points <- cumsum(c(0, rep(dx_m, N), rep(dx_d, N), rep(dx_b, N)));
+points <- cumsum(c(0, rep(dx_m, N), 0, rep(dx_d, N), rep(dx_b, N)));
 
 dt<- (min(dx_m, dx_d, dx_b))^2/(2);
 

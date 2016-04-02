@@ -4,7 +4,7 @@ library(shiny)
 shinyUI(fluidPage(
 
 #  Application title
-            titlePanel("Sliders"),
+            titlePanel("Biser model"),
 
 # Sidebar with sliders that demonstrate various available
 # options
@@ -13,7 +13,7 @@ shinyUI(fluidPage(
 # Simple integer interval
                     actionButton("go", "Calculate"),
                     numericInput("T", "Time to simulate (s):", 100),
-                    numericInput("n", "Mesh on each interval:", 10),
+                    numericInput("n", "Mesh on each interval(on each 3 layers!):", 30),
                     numericInput("km_1", "Km_1(10E-3):", 6.8),
                     numericInput("vmax_1", "Vmax_1(10E-5):", 4),
                     numericInput("alpha", "Proportion coef.:", 0.5),
