@@ -156,14 +156,14 @@ void static_fill(struct bio_params *bio_info) {
 
 int main() {
     struct bio_params *bio_info = new bio_params;
-    std::vector<double> P, G, O2;
+    std::vector<double> P, G, O2, t, Ct_g, Ct_p, Ct_o2;
 
 #ifdef JSON
     json_fill(bio_info);
 #else
     static_fill(bio_info);
 #endif
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &G, &O2);
+    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &G, &O2, &t, &Ct_g, &Ct_p, &Ct_o2);
 
 
     free(bio_info->layers);

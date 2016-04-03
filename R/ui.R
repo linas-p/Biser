@@ -17,11 +17,11 @@ shinyUI(fluidPage(
                     numericInput("km_1", "Km_1(10E-3):", 6.8),
                     numericInput("vmax_1", "Vmax_1(10E-5):", 4),
                     numericInput("alpha", "Proportion coef.:", 0.5),
-                    
+
                     numericInput("d_m", "Micro-reactor interval length(cm):", 0.10),
                     numericInput("d_d", "Diffusion interval length(cm):", 0.02),
                     numericInput("d_b", "Baundary interval length(cm):", 0.03),
-                    
+
 
                     numericInput("D_gm", "laeyr1 D_{g, m}(10E-6):", 2.2),
                     numericInput("D_pm", "laeyr1 D_{p, m}(10E-6):", 2.2),
@@ -38,10 +38,10 @@ shinyUI(fluidPage(
 
 # Show a table summarizing the values entered
                 mainPanel(
-                	  textOutput("text1"),
+                    textOutput("text1"),
                     plotOutput("System1"),
                     plotOutput("System2"),
-                	  textOutput("text2")
+                    textOutput("text2")
                 )
             )
         ))

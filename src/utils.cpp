@@ -9,8 +9,8 @@
 namespace BiserLikeModel {
 
 double LaplacePolar(double *array, int k, double dr, double r) {
-    double val = (array[k+1] - 2 * array[k] + array[k-1])/(dr*dr) 
-   + (1/r)* (array[k+1] - array[k-1])/(dr);
+    double val = (array[k+1] - 2 * array[k] + array[k-1])/(dr*dr)
+                 + (1/r)* (array[k+1] - array[k-1])/(dr);
     return val;
 
 }
@@ -59,6 +59,10 @@ void PrintArray(double *array, int length) {
 void concatenate_vals(double *x, std::vector<double> * out, int length) {
     std::vector<double> tmp(x, (x + length));
     out->insert(out->end(), tmp.begin(), tmp.end());
+}
+
+void FillArray(std::vector<double> * out, double value) {
+    out->push_back(value);
 }
 
 }  // namespace BiserLikeModel

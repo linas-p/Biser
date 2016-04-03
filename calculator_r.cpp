@@ -105,7 +105,7 @@ void r_fill(struct bio_params *bio_info, const Rcpp::NumericVector & values) {
     bio_info->resp_t = values[25];
 
     bio_info->out_file_name = "output.dat";
-    bio_info->write_to_file = false;
+    bio_info->write_to_file = true;
     bio_info->ne = 1;
 
     // [mol/l] -> [mol/cm^3]
@@ -162,9 +162,9 @@ RcppExport SEXP calculate(SEXP x) {
     r_fill(bio_info, params);
     //json_fill(bio_info);
 
-    std::vector<double> P, G, O2;
+    std::vector<double> P, G, O2, t, Ct_g, Ct_p, Ct_o2;
     std::clock_t start = std::clock();
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &G, &O2);
+    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &G, &O2, &t, &Ct_g, &Ct_p, &Ct_o2);
 
     double time = (std::clock()-start)/ static_cast<double>(CLOCKS_PER_SEC);
     std::cout << "\n all time " << time << std::endl;
@@ -177,7 +177,11 @@ RcppExport SEXP calculate(SEXP x) {
     free(bio_info->layers);
     free(bio_info);
 
-    return( Rcpp::List::create(Rcpp::Named("P")=PP,
+    return(Rcpp::List::create(Rcpp::Named("P")=PP,
                                Rcpp::Named("G")=GG,
-                               Rcpp::Named("O2")=OO2));
+                               Rcpp::Named("O2")=OO2,
+                               Rcpp::Named("t")=t,
+                               Rcpp::Named("Ct_g")=Ct_g,
+                               Rcpp::Named("Ct_p")=Ct_p,
+                               Rcpp::Named("Ct_02")=Ct_o2));
 }

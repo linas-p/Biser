@@ -39,13 +39,13 @@ DO2_d <- DO2_m*3;
 alpha <- 0.5;
 
 params<- c(
-KM1, KM1,
-VMAX1, VMAX1,
-dt, N,
-P_0, G_0, O2_0,
-alpha,
-1, DG_m, DO2_m, DP_m, 10,
-0, DG_d, DO2_d, DP_d, 2,
-0, DG_d, DO2_d, DP_d, 3,
-dt*100000
+    KM1, KM1,
+    VMAX1, VMAX1,
+    dt, N,
+    P_0, G_0, O2_0,
+    alpha,
+    1, DG_m, DO2_m, DP_m, 0.10,
+    0, DG_d, DO2_d, DP_d, 0.02,
+    0, DG_d, DO2_d, DP_d, 0.03,
+    dt*100000
 );
