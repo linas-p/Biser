@@ -148,6 +148,7 @@ void r_fill(struct bio_params *bio_info, const Rcpp::NumericVector & values) {
     // [um] -> [cm]
     bio_info->layers[2].d = values[24];
 
+    bio_info->oxigen = values[26];
 }
 
 void callback_crunched(void *ptr, int time) {

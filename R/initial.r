@@ -47,5 +47,5 @@ params<- c(
     1, DG_m, DO2_m, DP_m, 0.10,
     0, DG_d, DO2_d, DP_d, 0.02,
     0, DG_d, DO2_d, DP_d, 0.03,
-    dt*100000
+    dt*100000, 0
 );

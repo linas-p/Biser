@@ -70,6 +70,8 @@ struct bio_params {
 
     // Biojutiklio sluoksnių masyvas
     struct layer_params *layers;
+
+    bool oxigen;
 };
 }  //  namespace BiserLikeModel
 #endif  //  INCLUDE_BISERLIKEMODEL_BIOSENSOR_INFORMATION_H_

@@ -47,7 +47,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     int response_time_reached;
 
     // Kinetikos dedamoji
-    double mm_g = 0.;
+    double mm_g = 0., mm_o2 = 0.;
 
     // Rezultatų saugojimui skirtas failas
     FILE *output_file;
@@ -66,6 +66,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double alpha                 = bio_info->alpha;
     double alpha_inverse = 1/alpha;
     int layer_count              = bio_info->layer_count;
+    double oxi = static_cast<double>(bio_info->oxigen);
 
     double Dg, Dg0, Dg1;
     double Dpr, Dpr0, Dpr1;
@@ -150,20 +151,28 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
 
         // Skaičiuojame MM taške 0
         mm_g = MM(last_g, 0, v_max1, km1);
+        mm_o2 = MM(last_o2, 0, v_max1, km1);
 
         // Kraštinė substrato nepratekėjimo sąlyga centre r = 0.
-        current_g[N_0]  = last_g[N_0]  +  dt * (Dg * LaplacePolar0(last_g, dr)   - mm_g);
-        current_pr[N_0] = last_pr[N_0] +  dt * (Dpr * LaplacePolar0(last_pr, dr) + mm_g);
-        current_o2[N_0] = last_o2[N_0] +  dt * (Do2 * LaplacePolar0(last_o2, dr) - mm_g);
+        current_g[N_0]  = last_g[N_0]  +  dt * (Dg * LaplacePolar0(last_g, dr)   - 
+((1 - oxi) * mm_g + oxi * mm_o2));
+        current_pr[N_0] = last_pr[N_0] +  dt * (Dpr * LaplacePolar0(last_pr, dr) + 
+((1 - oxi) * mm_g + oxi * mm_o2));
+        current_o2[N_0] = last_o2[N_0] +  dt * (Do2 * LaplacePolar0(last_o2, dr) - 
+((1 - oxi) * mm_g + oxi * mm_o2));
 
         //
         // Skaičiuojame sluoksnyje 0 < r < R_0
         for (a = N_0 + 1; a < N_R0m; a++) {
             mm_g = MM(last_g, a, v_max1, km1);
+            mm_o2 = MM(last_o2, a, v_max1, km1);
             // Įskaičiuojama difuzijos įtaka
-            current_g[a]  = last_g[a]  + dt * (Dg * LaplacePolar(last_g, a, dr, space_points[a])   - mm_g);
-            current_pr[a] = last_pr[a] + dt * (Dpr * LaplacePolar(last_pr, a, dr, space_points[a]) + mm_g);
-            current_o2[a] = last_o2[a] + dt * (Do2 * LaplacePolar(last_o2, a, dr, space_points[a]) - mm_g);
+            current_g[a]  = last_g[a]  + dt * (Dg * LaplacePolar(last_g, a, dr, space_points[a])   -
+((1 - oxi) * mm_g + oxi * mm_o2));
+            current_pr[a] = last_pr[a] + dt * (Dpr * LaplacePolar(last_pr, a, dr, space_points[a]) + 
+((1 - oxi) * mm_g + oxi * mm_o2));
+            current_o2[a] = last_o2[a] + dt * (Do2 * LaplacePolar(last_o2, a, dr, space_points[a]) -
+((1 - oxi) * mm_g + oxi * mm_o2));
         }
 
         // Sluoksnių sandūroms pritaikomos derinimo sąlygos taške R_0
