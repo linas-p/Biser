@@ -13,6 +13,7 @@ namespace BiserLikeModel {
 double LaplacePolar(double *array, int k, double dr, double r);
 double LaplacePolar0(double *array, double dr);
 double MM(double *array, int k, double vmax, double km);
+double MM2(double V1, double V2);
 
 void SwapArrays(double **array1, double **array2);
 void condition_assing(double *array1, double *array2, int length, double value);

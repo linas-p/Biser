@@ -9,8 +9,8 @@ dyn.unload("calculator.so")
 
 # Define server logic for slider examples
 shinyServer(function(input, output) {
-
-    getDt <- function() {
+  
+    getDt <- function(){
         dx <- min(input$d_m, input$d_d, input$d_b);
         dt <- dx^2/(2);
         print(paste("dt ", dt));
@@ -46,34 +46,25 @@ shinyServer(function(input, output) {
         deltat<- cumsum(c(0, rep(dx1, input$n), 0, rep(dx2, input$n), rep(dx3, input$n)));
 
         params<- c(
-            input$km_1 * 1e-3, input$km_1 * 1e-3,
-            input$vmax_1 * 1e-5, input$vmax_1 * 1e-5,
+            input$km_1 * 1e-3, input$km_2 * 1e-4,
+            input$vmax_1 * 1e-4, input$vmax_2 * 1e-4,
             getDt(), input$n,
-            0., input$g_0 * 1e-3, input$o2_0 * 1e-4,
-            input$alpha,
-            1, input$D_gm * 1e-6, input$D_pm * 1e-6, input$D_o2m * 1e-5, input$d_m,
-            0, input$D_gd * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_d,
-            0, input$D_gd * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_b,
-            input$T, 1
+            0., input$l_0 * 1e-3, input$o2_0 * 1e-4,
+            input$rho,
+            1, input$D_lm * 1e-6, input$D_pm * 1e-6, input$D_o2m * 1e-5, input$d_m,
+            0, input$D_ld * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_d,
+            0, input$D_ld * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_b,
+            input$T
         );
 
         result<- .Call("calculate", params);
 
-        min_val <- min(result$G, result$P, result$O2);
-        max_val <- max(result$G, result$P, result$O2);
-
-        plot(deltat, result$G, type="b", pch='-', ylim = c(min_val, max_val), xlab = "x(cm)", ylab="raw curves", col="blue");
-
-        lines(deltat, result$P, type="b", pch='-', col="red");
-        lines(deltat, result$O2, type="b", pch='-', col="green");
-
-        params[27] <- 0;
-        result<- .Call("calculate", params);
+        plot(deltat, result$L, type="o", xlab = "x(cm)", ylab="raw curves", col="blue");
         
-        lines(deltat, result$G, type="l",  col="blue");
-        lines(deltat, result$P, type="l",  col="red");
-        lines(deltat, result$O2, type="l",  col="green");
-
+        lines(deltat, result$P, type="o", col="red");
+        lines(deltat, result$O2, type="o", col="green");
+        
+        
         legend("bottomright",legend=c("G", "P", "O_2"),
         text.col=c("blue","red", "green"), col=c("blue","red", "green"));
 
@@ -90,26 +81,25 @@ shinyServer(function(input, output) {
         deltat<- cumsum(c(0, rep(dx1, input$n), 0, rep(dx2, input$n), rep(dx3, input$n)));
 
         params<- c(
-            input$km_1 * 1e-3, input$km_1 * 1e-3,
-            input$vmax_1 * 1e-5, input$vmax_1 * 1e-5,
+            input$km_1 * 1e-3, input$km_2 * 1e-4,
+            input$vmax_1 * 1e-4, input$vmax_2 * 1e-4,
             getDt(), input$n,
-            0., input$g_0 * 1e-3, input$o2_0 * 1e-4,
-            input$alpha,
-            1, input$D_gm * 1e-6, input$D_pm * 1e-6, input$D_o2m * 1e-5, input$d_m,
-            0, input$D_gd * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_d,
-            0, input$D_gd * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_b,
-            input$T, 0
+            0., input$l_0 * 1e-3, input$o2_0 * 1e-4,
+            input$rho,
+            1, input$D_lm * 1e-6, input$D_pm * 1e-6, input$D_o2m * 1e-5, input$d_m,
+            0, input$D_ld * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_d,
+            0, input$D_ld * 1e-6, input$D_pd * 1e-6, input$D_o2d * 1e-5, input$d_b,
+            input$T
         );
 
         result<- .Call("calculate", params);
-
-#        plot(deltat, result$G/(input$g_0 * 1e-3), type="o", ylim= c(0,1),  xlab = "x(cm)", ylab="normalized (0,1)", col="blue");
-#        lines(deltat, result$P/max(result$P), type="o", col="red");
-#        lines(deltat, result$O2/(input$o2_0 * 1e-4), type="o", col="green");
-        plot(result$t,  result$Ct_g/max(result$Ct_g), type="o", ylim= c(0,1),  xlab = "t(s)", ylab="C(t)", col="blue");
-        lines(result$t, result$Ct_p/max(result$Ct_p), type="o", col="red");
-        lines(result$t, result$Ct_02/max(result$Ct_02), type="o", col="green");
-
+        
+        plot(deltat, result$L/(input$l_0 * 1e-3), type="o", ylim= c(0,1),  xlab = "x(cm)", ylab="normalized (0,1)", col="blue");
+        
+        lines(deltat, result$P/max(result$P), type="o", col="red");
+        lines(deltat, result$O2/(input$o2_0 * 1e-4), type="o", col="green");
+        
+        
         legend("bottomright",legend=c("G", "P", "O_2"),
         text.col=c("blue","red", "green"), col=c("blue","red", "green"))
         dyn.unload("calculator.so")

@@ -13,7 +13,7 @@ namespace BiserLikeModel {
 void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                           void (*callback_crunched)(void *, int),
                           std::vector<double> * P, \
-                          std::vector<double> * G, \
+                          std::vector<double> * L, \
                           std::vector<double> * O2, \
                           std::vector<double> * t, \
                           std::vector<double> * Ct_g,\

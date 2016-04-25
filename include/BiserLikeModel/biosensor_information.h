@@ -26,8 +26,8 @@ struct layer_params {
     // Laukas nurodo ar tai fermento sluoksnis
     int enz_layer;
 
-    // Difuzijos koeficientai (cm^2/s)
-    double Dg;
+    // Difuzijos koeficientai (M/s)
+    double Dl;
     double Dpr;
     double Do2;
 
@@ -37,11 +37,12 @@ struct layer_params {
 
 struct bio_params {
 
-    // Pusiausvyros konstantos (mol/cm^3)
+    // Pusiausvyros konstantos (M)
     double km1, km2;
-	double alpha;
+	double rho;
 
 	//double kcat1, kcat2;
+    // Greicio konstantos (M/s)
     double vmax1, vmax2;
 
     // Žingsnis pagal laiką (s)
@@ -60,18 +61,17 @@ struct bio_params {
     // Elektronų, dalyvaujančių krūvio pernešime, skaičius
     int ne;
 
-    // Pradinės koncentracijos tirpale (mol/cm^3)
+    // Pradinės koncentracijos tirpale (M)
     double pr_0;
-    double g_0;
+    double l_0;
     double o2_0;
 
     // Biojutiklio sluoksnių skaičius
     int layer_count;
+    double oxigen;
 
     // Biojutiklio sluoksnių masyvas
     struct layer_params *layers;
-
-    bool oxigen;
 };
 }  //  namespace BiserLikeModel
 #endif  //  INCLUDE_BISERLIKEMODEL_BIOSENSOR_INFORMATION_H_

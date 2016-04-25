@@ -9,9 +9,9 @@ N_R <- 3*N + 2;
 layers<- 3;
 grid_size <- N * layers + 2;
 
-R_0 <- 0.10;
-R_1 <- 0.12;
-R<- 0.15;
+R_0 <- 0.025;
+R_1 <- 0.03;
+R<- 0.084;
 
 dx_m <- R_0 / N;
 dx_d <- (R_1-R_0) / N;
@@ -23,29 +23,55 @@ dt<- (min(dx_m, dx_d, dx_b))^2/(2);
 
 P_0<- 0;
 O2_0 <- 2.5*1e-4;
-G_0 <- 1e-3;
+L_0 <- 2e-3;
 
-KM1 <- 6.8*1e-3;
-VMAX1 <- 4*1e-5;
+KM1 <- 9.6 * 1e-3;
+KM2 <- 5 * 1e-4;
+VMAX1 <- 1.9 * 1e-4;
+VMAX2 <- 3.9 * 1e-4;
 
-DG_m <- 2.2*1e-6;
+DL_m <- 2.2*1e-6;
 DP_m <- 2.2*1e-6;
 DO2_m <- 0.8*1e-5;
 
-DG_d <- DG_m*3;
-DP_d <- DP_m*3;
-DO2_d <- DO2_m*3;
+DL_d <- 6.7 * 1e-6;
+DP_d <- 6.7 * 1e-6;
+DO2_d <- 2.4 * 1e-5;
 
-alpha <- 0.5;
+rho <- 0.56;
 
 params<- c(
-    KM1, KM1,
-    VMAX1, VMAX1,
-    dt, N,
-    P_0, G_0, O2_0,
-    alpha,
-    1, DG_m, DO2_m, DP_m, 0.10,
-    0, DG_d, DO2_d, DP_d, 0.02,
-    0, DG_d, DO2_d, DP_d, 0.03,
-    dt*100000, 0
+KM1, KM2,
+VMAX1, VMAX2,
+dt, N,
+P_0, L_0, O2_0,
+rho,
+1, DL_m, DO2_m, DP_m, 0.025,
+0, DL_d, DO2_d, DP_d, 0.005,
+0, DL_d, DO2_d, DP_d, 0.034,
+dt*10000
 );
+
+
+
+LaplacePolar <- function(vec, p, dr, r){
+  #tmp <- ((vec[p+1] - 2*vec[p] + vec[p-1])/(dr^2) + (2/r)*(vec[p+1]-vec[p])/(dr));
+  tmp <- ((vec[p+1] - 2*vec[p] + vec[p-1])/(dr^2) + (1/r)*(vec[p+1]-vec[p-1])/(dr));
+  
+  return(tmp);
+}
+
+LaplacePolar0 <- function(vec, dr){
+  
+  tmp <- 2*(vec[2] - vec[1])/(dr^2);
+  
+  return(tmp);
+}
+
+MM <- function(vec, p, vmax, km){
+  return(vmax * vec[p]/(km+vec[p]));
+}
+
+MM2 <- function(v1, v2){
+  return(v1*v2/(v1+2*v2));
+}

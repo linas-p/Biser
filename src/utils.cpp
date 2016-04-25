@@ -9,8 +9,8 @@
 namespace BiserLikeModel {
 
 double LaplacePolar(double *array, int k, double dr, double r) {
-    double val = (array[k+1] - 2 * array[k] + array[k-1])/(dr*dr)
-                 + (1/r)* (array[k+1] - array[k-1])/(dr);
+    double val = (array[k+1] - 2 * array[k] + array[k-1])/(dr*dr) 
+   + (1/r)* (array[k+1] - array[k-1])/(dr);
     return val;
 
 }
@@ -22,6 +22,11 @@ double LaplacePolar0(double *array, double dr) {
 
 double MM(double *array, int k, double vmax, double km) {
     double val = vmax*array[k]/(km+array[k]);
+    return val;
+}
+
+double MM2(double V1, double V2) {
+    double val = (V1 * V2) /(V1 + 2 * V2);
     return val;
 }
 
