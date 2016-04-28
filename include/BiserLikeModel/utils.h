@@ -5,6 +5,8 @@
  * */
 #ifndef INCLUDE_BISERLIKEMODEL_UTILS_H_
 #define INCLUDE_BISERLIKEMODEL_UTILS_H_
+#define Unlikely(x) __builtin_expect((bool)(x), 0)
+#define Likely(x)   __builtin_expect((bool)(x), 1)
 
 #include <stdio.h>
 #include <vector>

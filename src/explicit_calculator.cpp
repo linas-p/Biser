@@ -76,8 +76,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double dr, dr0, dr1;
     double v_max1                  = bio_info->vmax1;
     double v_max2                  = bio_info->vmax2;
-//	int16_t N_0 = 0, N_R0 = n, N_R1 = 2 * n, N_R = 3 * n;
-	int16_t N_0 = 0, N_R0m = n, N_R0p = n + 1, N_R1 = 2 * n + 1, N_R = 3 * n + 1;
+    int16_t N_0 = 0, N_R0m = n, N_R0p = n + 1, N_R1 = 2 * n + 1, N_R = 3 * n + 1;
 
     // Sukuriamas rezultatų saugojimui skirtas failas
     if(write_to_file) {
