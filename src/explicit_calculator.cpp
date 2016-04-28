@@ -64,7 +64,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     char *out_file_name          = bio_info->out_file_name;
     double o2_0                  = bio_info->o2_0;
     double l_0                   = bio_info->l_0;
-	double rho                   = bio_info->rho;
+    double rho                   = bio_info->rho;
     //double rho_inverse = 1/rho;
     int layer_count              = bio_info->layer_count;
     double oxi = static_cast<double>(bio_info->oxigen);
@@ -96,7 +96,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     double *current_o2 = new double[point_count],
     *last_o2 = new double[point_count];
 
-	//Debug mode
+    //Debug mode
     FillArray(current_l, -1, N_0, N_R);
     FillArray(current_pr, -1, N_0, N_R);
     FillArray(current_o2, -1, N_0, N_R);
@@ -115,29 +115,29 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     space_points = new double[point_count];
     space_points[N_0] = 0.;
 
-    for (a = 0; a < layer_count; a++){
-        space_steps[a] = bio_info->layers[a].d / n;  
+    for (a = 0; a < layer_count; a++) {
+        space_steps[a] = bio_info->layers[a].d / n;
     }
 
 
     int j;
-    for(j = 1; j < N_R0p; j++){
+    for(j = 1; j < N_R0p; j++) {
         space_points[j] = space_points[j-1] + space_steps[0];
         //printf("<-%d, %f\n", j, space_points[j]);
-    }    
+    }
     space_points[N_R0p] = space_points[N_R0m];
-    for (a = 1; a < layer_count; a++){
+    for (a = 1; a < layer_count; a++) {
         int j;
-        for(j = a*n+2; j < a*n+2+n; j++){
+        for(j = a*n+2; j < a*n+2+n; j++) {
             space_points[j] = space_points[j-1] + space_steps[a];
             //printf("<-%d, %f\n", j, space_points[j]);
-        }    
+        }
     }
     //PrintArray(space_points, point_count);
 
-	double delta_inverse = 1/((pow(bio_info->layers[BAUDARY].d, 3) - pow(bio_info->layers[DIFFUSION].d, 3))/(3 * pow(bio_info->layers[DIFFUSION].d, 2)));
+    double delta_inverse = 1/((pow(bio_info->layers[BAUDARY].d, 3) - pow(bio_info->layers[DIFFUSION].d, 3))/(3 * pow(bio_info->layers[DIFFUSION].d, 2)));
 
-	std::clock_t start = std::clock();
+    std::clock_t start = std::clock();
     printf("start delta %f\n", delta_inverse);
     do {
         // Iteruojama per biojutiklio sluoksnius,
@@ -149,9 +149,9 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         Do2 = bio_info->layers[MICROREACTOR].Do2;
         dr = space_steps[MICROREACTOR];
 
-		// Skaičiuojame MM taške 0
-		mm_l  = MM(last_l, 0, v_max1, km1);
-		mm_o2 = MM(last_o2, 0, v_max2, km2);
+        // Skaičiuojame MM taške 0
+        mm_l  = MM(last_l[N_0], v_max1, km1);
+        mm_o2 = MM(last_o2[N_0], v_max2, km2);
         mm    = MM2(mm_l, mm_o2);
 
         // Kraštinė substrato nepratekėjimo sąlyga centre r = 0.
@@ -159,23 +159,23 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         current_pr[N_0] = last_pr[N_0] +  dt * (Dpr * LaplacePolar0(last_pr, dr) +  mm);
         current_o2[N_0] = last_o2[N_0] +  dt * (Do2 * LaplacePolar0(last_o2, dr) - mm);
 
-		//
-		// Skaičiuojame sluoksnyje 0 < r < R_0
+        //
+        // Skaičiuojame sluoksnyje 0 < r < R_0
         for (a = N_0 + 1; a < N_R0m; a++) {
-	            mm_l  = MM(last_l, a, v_max1, km1);
-				mm_o2 = MM(last_o2, a, v_max2, km2);
-				mm    = MM2(mm_l, mm_o2);
-                // Įskaičiuojama difuzijos įtaka
-                current_l[a]  = last_l[a]  + dt * (Dl * LaplacePolar(last_l, a, dr, space_points[a])   -  mm);
-                current_pr[a] = last_pr[a] + dt * (Dpr * LaplacePolar(last_pr, a, dr, space_points[a]) +  mm);
-                current_o2[a] = last_o2[a] + dt * (Do2 * LaplacePolar(last_o2, a, dr, space_points[a]) - mm_l);
-				if(current_o2[a] < 0){
-					current_o2[a] = 0.;
-				}
+            mm_l  = MM(last_l[a], v_max1, km1);
+            mm_o2 = MM(last_o2[a], v_max2, km2);
+            mm    = MM2(mm_l, mm_o2);
+            // Įskaičiuojama difuzijos įtaka
+            current_l[a]  = last_l[a]  + dt * (Dl * LaplacePolar(last_l, a, dr, space_points[a])   -  mm);
+            current_pr[a] = last_pr[a] + dt * (Dpr * LaplacePolar(last_pr, a, dr, space_points[a]) +  mm);
+            current_o2[a] = last_o2[a] + dt * (Do2 * LaplacePolar(last_o2, a, dr, space_points[a]) - mm_l);
+            if(current_o2[a] < 0) {
+                current_o2[a] = 0.;
+            }
         }
 
-        // Sluoksnių sandūroms pritaikomos derinimo sąlygos taške R_0 
-		// TODO add normal with rho
+        // Sluoksnių sandūroms pritaikomos derinimo sąlygos taške R_0
+        // TODO add normal with rho
         {
 
             Dl0 = bio_info->layers[MICROREACTOR].Dl;
@@ -189,49 +189,49 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             dr1 = space_steps[DIFFUSION];
 
             current_l[N_R0m] = rho * (Dl1 * dr0 * last_l[N_R0p + 1] + \
-                            Dl0 * dr1 * last_l[N_R0m - 1]) / \
-                           (Dl1 * dr0 + rho * Dl0 * dr1);
+                                      Dl0 * dr1 * last_l[N_R0m - 1]) / \
+                               (Dl1 * dr0 + rho * Dl0 * dr1);
             /*current_pr[N_R0m] = rho_inverse * (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
                              Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
                             (Dpr1 * dr0 + rho_inverse * Dpr0 * dr1);*/
-			current_pr[N_R0m] = rho * (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
-                             Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
-                            (Dpr1 * dr0 + rho * Dpr0 * dr1);
+            current_pr[N_R0m] = rho * (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
+                                       Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
+                                (Dpr1 * dr0 + rho * Dpr0 * dr1);
             current_o2[N_R0m] = rho * (Do21 * dr0 * last_o2[N_R0p + 1] + \
-                             Do20 * dr1 * last_o2[N_R0m - 1]) / \
-                            (Do21 * dr0 + rho * Do20 * dr1);
+                                       Do20 * dr1 * last_o2[N_R0m - 1]) / \
+                                (Do21 * dr0 + rho * Do20 * dr1);
 
             current_l[N_R0p] = (Dl1 * dr0 * last_l[N_R0p + 1] + \
-                            Dl0 * dr1 * last_l[N_R0m - 1]) / \
-                           (Dl1 * dr0 + rho * Dl0 * dr1);
+                                Dl0 * dr1 * last_l[N_R0m - 1]) / \
+                               (Dl1 * dr0 + rho * Dl0 * dr1);
             /*current_pr[N_R0p] = (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
                              Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
                             (Dpr1 * dr0 + rho_inverse * Dpr0 * dr1);*/
-			current_pr[N_R0p] = (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
-                             Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
-                            (Dpr1 * dr0 + rho * Dpr0 * dr1);
+            current_pr[N_R0p] = (Dpr1 * dr0 * last_pr[N_R0p + 1] + \
+                                 Dpr0 * dr1 * last_pr[N_R0m - 1]) / \
+                                (Dpr1 * dr0 + rho * Dpr0 * dr1);
             current_o2[N_R0p] = (Do21 * dr0 * last_o2[N_R0p + 1] + \
-                             Do20 * dr1 * last_o2[N_R0m - 1]) / \
-                            (Do21 * dr0 + rho * Do20 * dr1);
+                                 Do20 * dr1 * last_o2[N_R0m - 1]) / \
+                                (Do21 * dr0 + rho * Do20 * dr1);
         }
 
 
-		// Surenkami antrojo sluoksnio parametrai
+        // Surenkami antrojo sluoksnio parametrai
         Dl  = bio_info->layers[DIFFUSION].Dl;
         Dpr = bio_info->layers[DIFFUSION].Dpr;
         Do2 = bio_info->layers[DIFFUSION].Do2;
         dr = space_steps[DIFFUSION];
 
-		// Skaičiuojame sluoksnyje R_0 < r < R_1
+        // Skaičiuojame sluoksnyje R_0 < r < R_1
         for (a = N_R0p + 1; a < N_R1; a++) {
-                // Įskaičiuojama difuzijos įtaka
-                current_l[a]  = last_l[a]  + dt * Dl * LaplacePolar(last_l, a, dr, space_points[a]);
-                current_pr[a] = last_pr[a] + dt * Dpr * LaplacePolar(last_pr, a, dr, space_points[a]);
-                current_o2[a] = last_o2[a] + dt * Do2 * LaplacePolar(last_o2, a, dr, space_points[a]);
+            // Įskaičiuojama difuzijos įtaka
+            current_l[a]  = last_l[a]  + dt * Dl * LaplacePolar(last_l, a, dr, space_points[a]);
+            current_pr[a] = last_pr[a] + dt * Dpr * LaplacePolar(last_pr, a, dr, space_points[a]);
+            current_o2[a] = last_o2[a] + dt * Do2 * LaplacePolar(last_o2, a, dr, space_points[a]);
 
         }
 
-        // Sluoksnių sandūroms pritaikomos derinimo sąlygos taške R_1 
+        // Sluoksnių sandūroms pritaikomos derinimo sąlygos taške R_1
         {
 
             Dl0 = bio_info->layers[DIFFUSION].Dl;
@@ -245,28 +245,28 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
             dr1 = space_steps[BAUDARY];
 
             current_l[N_R1] = (Dl1 * dr0 * last_l[N_R1 + 1] + \
-                            Dl0 * dr1 * last_l[N_R1 - 1]) / \
-                           (Dl1 * dr0 + Dl0 * dr1);
+                               Dl0 * dr1 * last_l[N_R1 - 1]) / \
+                              (Dl1 * dr0 + Dl0 * dr1);
             current_pr[N_R1] = (Dpr1 * dr0 * last_pr[N_R1 + 1] + \
-                             Dpr0 * dr1 * last_pr[N_R1 - 1]) / \
-                            (Dpr1 * dr0 + Dpr0 * dr1);
+                                Dpr0 * dr1 * last_pr[N_R1 - 1]) / \
+                               (Dpr1 * dr0 + Dpr0 * dr1);
             current_o2[N_R1] = (Do21 * dr0 * last_o2[N_R1 + 1] + \
-                             Do20 * dr1 * last_o2[N_R1 - 1]) / \
-                            (Do21 * dr0 + Do20 * dr1);
+                                Do20 * dr1 * last_o2[N_R1 - 1]) / \
+                               (Do21 * dr0 + Do20 * dr1);
         }
 
-		// Surenkami trečiojo sluoksnio parametrai
+        // Surenkami trečiojo sluoksnio parametrai
         Dl  = bio_info->layers[BAUDARY].Dl;
         Dpr = bio_info->layers[BAUDARY].Dpr;
         Do2 = bio_info->layers[BAUDARY].Do2;
         dr = space_steps[BAUDARY];
 
-		// Skaičiuojame sluoksnyje R_1 < r <= R
+        // Skaičiuojame sluoksnyje R_1 < r <= R
         for (a = N_R1 + 1; a < N_R + 1; a++) {
-                // Įskaičiuojama difuzijos įtaka
-                current_l[a]  = last_l[a]  -  dt * Dl  * delta_inverse * (last_l[N_R1]  - last_l[N_R1-1])/dr;
-                current_pr[a] = last_pr[a] -  dt * Dpr * delta_inverse * (last_pr[N_R1] - last_pr[N_R1-1])/dr;
-                current_o2[a] = last_o2[a] -  dt * Do2 * delta_inverse * (last_o2[N_R1] - last_o2[N_R1-1])/dr;
+            // Įskaičiuojama difuzijos įtaka
+            current_l[a]  = last_l[a]  -  dt * Dl  * delta_inverse * (last_l[N_R1]  - last_l[N_R1-1])/dr;
+            current_pr[a] = last_pr[a] -  dt * Dpr * delta_inverse * (last_pr[N_R1] - last_pr[N_R1-1])/dr;
+            current_o2[a] = last_o2[a] -  dt * Do2 * delta_inverse * (last_o2[N_R1] - last_o2[N_R1-1])/dr;
         }
 
 
@@ -323,8 +323,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
                 response_time_reached = 0;
                 break;
             }
-            // Jeigu jau pasiekė minimalų laiką,
-            // tuomet tikrinama pagal DEFAULT_TIME sąlygas
+        // Jeigu jau pasiekė minimalų laiką,
+        // tuomet tikrinama pagal DEFAULT_TIME sąlygas
         case DEFAULT_TIME:
             break;
         case FIXED_TIME:
@@ -333,8 +333,8 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
         }
     } while (!response_time_reached);
 
-	double duration = (std::clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
-	printf("operations per sec %d \n", t/duration);
+    double duration = (std::clock() - start) / static_cast<double>(CLOCKS_PER_SEC);
+    printf("operations per sec %d \n", t/duration);
     printf("total operation: %d, simulated time: %f \n", t, execution_time);
     fflush(stdout);
 
@@ -369,7 +369,7 @@ void calculate_explicitly(struct bio_params *bio_info, void *ptr, \
     if (callback_crunched != NULL)
         callback_crunched(ptr, t);
 
-	// Gražiname norimą rezultatą
+    // Gražiname norimą rezultatą
     concatenate_vals(last_l, L, point_count);
     concatenate_vals(last_pr, P, point_count);
     concatenate_vals(last_o2, O2, point_count);

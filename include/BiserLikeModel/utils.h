@@ -10,12 +10,15 @@
 
 #include <stdio.h>
 #include <vector>
+#include <cmath>
 
 namespace BiserLikeModel {
-double LaplacePolar(double *array, int k, double dr, double r);
+
+double MM2(double _v1, double _v2);
+double MM(double _val, double _vmax, double _km);
 double LaplacePolar0(double *array, double dr);
-double MM(double *array, int k, double vmax, double km);
-double MM2(double V1, double V2);
+double LaplacePolar(double *array, int k, double dr, double r);
+
 
 void SwapArrays(double **array1, double **array2);
 void condition_assing(double *array1, double *array2, int length, double value);
