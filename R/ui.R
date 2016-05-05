@@ -12,8 +12,8 @@ shinyUI(fluidPage(
                 sidebarPanel(
 # Simple integer interval
                     actionButton("go", "Calculate"),
-                    numericInput("T", "Time to simulate (s):", 100),
-                    numericInput("n", "Mesh on each interval(on each 3 layers!):", 30),
+                    numericInput("T", "Time to simulate (s):", 25),
+                    numericInput("n", "Mesh on each interval(on each 3 layers!):", 10),
                     numericInput("km_1", "Km_1(10E-3):", 9.6),
                     numericInput("km_2", "Km_2(10E-4):", 5),
                     numericInput("vmax_1", "Vmax_1(10E-4):", 1.9),
@@ -34,8 +34,7 @@ shinyUI(fluidPage(
                     numericInput("D_pd", "laeyr2 D_{p, d}(10E-6):", 6.7),
                     numericInput("D_o2d", "laeyr2 D_{o2, d}(10E-5):", 2.4),
 
-                    numericInput("l_0", "l_0(10E-3):", 2),
-                    numericInput("o2_0", "o2_0(10E-4):", 2.5)
+                    numericInput("l_0", "l_0(10E-3):", 2)
 
                 ),
 
@@ -44,6 +43,8 @@ shinyUI(fluidPage(
                 	  textOutput("text1"),
                       plotOutput("System1"),
                       plotOutput("System2"),
+                	  plotOutput("System4"),
+                	  plotOutput("System3"),
                 	  textOutput("text2")
                 )
             )

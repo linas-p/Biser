@@ -1,4 +1,5 @@
 N <- 4;
+N_Ocpp <- 0;
 N_0 <- 1;
 N_R0m <- N + 1;
 N_R0p <- N + 2;
@@ -23,7 +24,7 @@ dt<- (min(dx_m, dx_d, dx_b))^2/(2);
 
 P_0<- 0;
 O2_0 <- 2.5*1e-4;
-L_0 <- 2e-3;
+L_0 <- 50e-3;
 
 KM1 <- 9.6 * 1e-3;
 KM2 <- 5 * 1e-4;
@@ -40,6 +41,8 @@ DO2_d <- 2.4 * 1e-5;
 
 rho <- 0.56;
 
+
+
 params<- c(
 KM1, KM2,
 VMAX1, VMAX2,
@@ -48,30 +51,26 @@ P_0, L_0, O2_0,
 rho,
 1, DL_m, DO2_m, DP_m, 0.025,
 0, DL_d, DO2_d, DP_d, 0.005,
-0, DL_d, DO2_d, DP_d, 0.034,
-dt*10000
+0, DL_d, DO2_d, DP_d, 0.054,
+dt*100000
 );
 
 
 
-LaplacePolar <- function(vec, p, dr, r){
-  #tmp <- ((vec[p+1] - 2*vec[p] + vec[p-1])/(dr^2) + (2/r)*(vec[p+1]-vec[p])/(dr));
+LaplacePolarR <- function(vec, p, dr, r){
   tmp <- ((vec[p+1] - 2*vec[p] + vec[p-1])/(dr^2) + (1/r)*(vec[p+1]-vec[p-1])/(dr));
-  
   return(tmp);
 }
 
-LaplacePolar0 <- function(vec, dr){
-  
+LaplacePolar0R <- function(vec, dr){
   tmp <- 2*(vec[2] - vec[1])/(dr^2);
-  
   return(tmp);
 }
 
-MM <- function(vec, p, vmax, km){
+MMR <- function(vec, p, vmax, km){
   return(vmax * vec[p]/(km+vec[p]));
 }
 
-MM2 <- function(v1, v2){
+MM2R <- function(v1, v2){
   return(v1*v2/(v1+2*v2));
 }
