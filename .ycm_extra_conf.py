@@ -31,6 +31,8 @@ flags = [
 '-I',
 '.',
 '-I',
+'./include/',
+'-I',
 './include'
 '-I',
 './ClangCompleter',

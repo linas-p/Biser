@@ -179,5 +179,9 @@ RcppExport SEXP calculate(SEXP x) {
 
     return(Rcpp::List::create(Rcpp::Named("P")=PP,
                                Rcpp::Named("L")=LL,
-                               Rcpp::Named("O2")=OO2));
+                               Rcpp::Named("O2")=OO2,
+                               Rcpp::Named("T")=t,
+                               Rcpp::Named("CL")=CL,
+                               Rcpp::Named("CP")=CP,
+                               Rcpp::Named("CO2")=CO2));
 }

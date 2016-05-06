@@ -52,12 +52,8 @@ TEST(MM, usage) {
 
 TEST(LaplacePolar0, usage) {
 
-    /*Usage*/
-    double array1[2] = {0, 1};
-    EXPECT_NEAR(LaplacePolar0(array1, 1.), 2, EPSILION);
-
-    double array2[2] = {1, 0};
-    EXPECT_NEAR(LaplacePolar0(array2, 1.), -2, EPSILION);
+    EXPECT_NEAR(LaplacePolar0(0, 1, 1.), 2, EPSILION);
+    EXPECT_NEAR(LaplacePolar0(1, 0, 1.), -2, EPSILION);
 
 
 }

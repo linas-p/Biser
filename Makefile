@@ -3,6 +3,7 @@ BUILD_DIR = build
 all: test R_pac
 test: $(BUILD_DIR)
 	cd $(BUILD_DIR); cmake $(CURDIR); make
+
 $(BUILD_DIR):
 	mkdir -p $@
 
@@ -36,6 +37,7 @@ clean:
 	rm -rf $(BUILD_DIR) calculator calculator_r.o calculator_r.so a.out \
 		$(SRC_DIR)/explicit_calculator.o $(SRC_DIR)/utils.o testing.o \
 		$(SRC_DIR)/explicit_calculator.so $(SRC_DIR)/utils.o testing.so \
-		calculator.so $(SRC_DIR)/utils.so
+		calculator.so $(SRC_DIR)/utils.so ./R/calculator.so ./R/rsconnect/\
+		./R/results.rda
 
 .PHONY: all cmake clean test

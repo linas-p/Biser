@@ -4,29 +4,29 @@
  *  GNU General Public license
  * */
 
-#include <BiserLikeModel/utils.h>
+#include "BiserLikeModel/utils.h"
 
 namespace BiserLikeModel {
 
-double LaplacePolar(double *array, int k, double dr, double r) {
-    double val = (array[k + 1] - 2 * array[k] + array[k - 1]) / (dr * dr)
-                 + (1 / r) * (array[k + 1] - array[k - 1])/(dr);
+double LaplacePolar(double valm, double valc, double valp, double dr, double r) {
+    double val = (valp - 2 * valc + valm) / (dr * dr)
+                 + (1 / r) * (valp - valm)/(dr);
     return val;
 
 }
 
-double LaplacePolar0(double * _array, double _dr) {
-    return (2 * (_array[1] - _array[0]) / std::pow(_dr, 2));
+double LaplacePolar0(double valc, double valp, double dr) {
+    return (2 * (valp - valc) / std::pow(dr, 2));
 }
 
-double MM(double _val, double _vmax, double _km) {
-    return (_vmax * _val) / (_km + _val);
+double MM(double val, double vmax, double km) {
+    return (vmax * val) / (km + val);
 }
 
-double MM2(double _v1, double _v2) {
+double MM2(double v1, double v2) {
     double val = 0;
-    if(Likely(_v1 || _v2)) {
-        val = (_v1 * _v2) /(_v1 + 2 * _v2);
+    if(Likely(v1 || v2)) {
+        val = (v1 * v2) /(v1 + 2 * v2);
     } else {
         val = 0;
     }
