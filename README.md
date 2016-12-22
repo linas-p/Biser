@@ -1,8 +1,5 @@
 [![Build Status](https://travis-ci.org/linas-p/Biser.svg?branch=master)](https://travis-ci.org/linas-p/Biser)
 
-Demo
-===
-Implementation can be access from <a href="https://elainas.shinyapps.io/biser">https://elainas.shinyapps.io/biser</a>.
 
 
 
