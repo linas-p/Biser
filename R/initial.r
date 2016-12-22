@@ -1,5 +1,4 @@
-N <- 4;
-N_Ocpp <- 0;
+N <- 20;
 N_0 <- 1;
 N_R0m <- N + 1;
 N_R0p <- N + 2;
@@ -46,13 +45,13 @@ rho <- 0.56;
 params<- c(
 KM1, KM2,
 VMAX1, VMAX2,
-dt, N,
+1e-3, N,
 P_0, L_0, O2_0,
 rho,
 1, DL_m, DO2_m, DP_m, 0.025,
 0, DL_d, DO2_d, DP_d, 0.005,
 0, DL_d, DO2_d, DP_d, 0.054,
-dt*100000
+25
 );
 
 

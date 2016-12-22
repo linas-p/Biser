@@ -18,7 +18,7 @@ using namespace BiserLikeModel;
 using json = nlohmann::json;
 void json_fill(struct bio_params *bio_info, \
                std::string configs = "../config/params.json") {
-     json j;
+    json j;
     std::ifstream ifs (configs, std::ifstream::in);
     ifs >> j;
 
@@ -39,6 +39,8 @@ void json_fill(struct bio_params *bio_info, \
     // [s]
     bio_info->resp_t = 20;
 
+    bio_info->dimensionless = false;
+
     bio_info->out_file_name = "output.dat";
     bio_info->write_to_file = true;
     bio_info->ne = 1;
@@ -47,7 +49,7 @@ void json_fill(struct bio_params *bio_info, \
     bio_info->pr_0 = j["initial_conditions"]["product_0"];
     bio_info->l_0 = j["initial_conditions"]["laccase_0"];
     bio_info->o2_0 = j["initial_conditions"]["oxygen_0"];
-	bio_info->rho = j["rho"];
+    bio_info->rho = j["rho"];
 
 
     bio_info->layer_count = j["layers"].size();
@@ -97,12 +99,15 @@ void r_fill(struct bio_params *bio_info, const Rcpp::NumericVector & values) {
     // [s]
     bio_info->dt = values[4];
     bio_info->n = values[5];
-    bio_info->resp_t_meth = FIXED_TIME;
+    bio_info->resp_t_meth = HALF_TIME;
+    //bio_info->resp_t_meth = FIXED_TIME;
 
     // [s]
     bio_info->min_t = 100;
     // [s]
     bio_info->resp_t = values[25];
+
+    bio_info->dimensionless = false;
 
     bio_info->out_file_name = "output.dat";
     bio_info->write_to_file = false;
@@ -162,9 +167,14 @@ RcppExport SEXP calculate(SEXP x) {
     r_fill(bio_info, params);
     //json_fill(bio_info);
 
-    std::vector<double> P, L, O2, t, CP, CL, CO2;
+    std::vector<double> P, L, O2, t, CP, CL, CO2, points;
+    t.reserve(DIVISION_RATE + 3);
+    CP.reserve(DIVISION_RATE + 3);
+    CL.reserve(DIVISION_RATE + 3);
+    CO2.reserve(DIVISION_RATE + 3);
+
     std::clock_t start = std::clock();
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
 
     double time = (std::clock()-start)/ static_cast<double>(CLOCKS_PER_SEC);
     std::cout << "\n all time " << time << std::endl;
@@ -177,11 +187,12 @@ RcppExport SEXP calculate(SEXP x) {
     free(bio_info->layers);
     free(bio_info);
 
-    return(Rcpp::List::create(Rcpp::Named("P")=PP,
-                               Rcpp::Named("L")=LL,
-                               Rcpp::Named("O2")=OO2,
-                               Rcpp::Named("T")=t,
-                               Rcpp::Named("CL")=CL,
-                               Rcpp::Named("CP")=CP,
-                               Rcpp::Named("CO2")=CO2));
+    return(Rcpp::List::create(Rcpp::Named("points")=points,
+                              Rcpp::Named("P")=PP,
+                              Rcpp::Named("L")=LL,
+                              Rcpp::Named("O2")=OO2,
+                              Rcpp::Named("T")=t,
+                              Rcpp::Named("CL")=CL,
+                              Rcpp::Named("CP")=CP,
+                              Rcpp::Named("CO2")=CO2));
 }

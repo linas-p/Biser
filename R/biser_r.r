@@ -17,7 +17,19 @@ delta <- 1/((R^3-R_1^3)/(3*R_1^2));
 
 tt<- c(); Ct_g <- c(); Ct_p <- c(); Ct_o2 <- c();
 
-for(time in 0:99999) {
+DO2_b <- DO2_d
+#DO2_d <- DO2_d*10
+DO2_d <- DO2_m
+dt <- 0.0001
+
+l_list1 <- c()
+o_list1 <- c()
+l_list2 <- c()
+o_list2 <- c()
+l_list3 <- c()
+o_list3 <- c()
+
+for(time in 0:(99999*5)) {#9
 
     kinetics_partl  <- MM(last_l[N_0], VMAX1 , KM1);
     kinetics_parto2 <- MM(last_o2[N_0], VMAX2 , KM2);
@@ -79,7 +91,7 @@ for(time in 0:99999) {
     for(k in N_R1:N_R) {
         current_l[k] <- last_l[k] - dt * delta * DL_d * (last_l[N_R1] - last_l[N_R1-1])/dx_d;
         current_p[k] <- last_p[k] - dt * delta * DP_d * (last_p[N_R1] - last_p[N_R1-1])/dx_d;
-        current_o2[k] <- last_o2[k] - dt * delta * DO2_d * (last_o2[N_R1] - last_o2[N_R1-1])/dx_d;
+        current_o2[k] <- last_o2[k] - dt * delta * DO2_b * (last_o2[N_R1] - last_o2[N_R1-1])/dx_d;
     }
 
 
@@ -87,16 +99,62 @@ for(time in 0:99999) {
     last_p <- current_p;
     last_o2 <- current_o2;
 
-    if(!(time %% 10000)) {
+    
+    if(!(time %% 1000)) {
+        l_list2 <- c(l_list2, current_l)
+        o_list2 <- c(o_list2, current_o2)
+        
         tt <- c(tt, time*dt);
-        Ct_g <- c(Ct_g, 3 /(R^3 - R_0^3) * ( sum(diff(points[6:10]) * (current_l[6:9] + current_l[7:10])/2 * ((points[6:9] + points[7:10])/2)^2) + (R^3 - R_1^3)/3*current_l[10]));
-        Ct_p <- c(Ct_p, 3 /(R^3 - R_0^3) * ( sum(diff(points[6:10]) * (current_p[6:9] + current_p[7:10])/2 * ((points[6:9] + points[7:10])/2)^2) + (R^3 - R_1^3)/3*current_p[10]));
-        Ct_o2 <- c(Ct_o2, 3 /(R^3 - R_0^3) * ( sum(diff(points[6:10]) * (current_o2[6:9] + current_o2[7:10])/2 * ((points[6:9] + points[7:10])/2)^2) + (R^3 - R_1^3)/3*current_o2[10]));
+        Ct_g <- c(Ct_g, 3 /(R^3 - R_0^3) * ( sum(diff(points[N_R0p:N_R1]) * (current_l[N_R0p:(N_R1 - 1)] + current_l[(N_R0p + 1):N_R1])/2 * ((points[N_R0p:(N_R1 - 1)] + points[(N_R0p + 1):N_R1])/2)^2) + (R^3 - R_1^3)/3*current_l[N_R1]));
+        Ct_p <- c(Ct_p, 3 /(R^3 - R_0^3) * ( sum(diff(points[N_R0p:N_R1]) * (current_p[N_R0p:(N_R1 - 1)] + current_p[(N_R0p + 1):N_R1])/2 * ((points[N_R0p:(N_R1 - 1)] + points[(N_R0p + 1):N_R1])/2)^2) + (R^3 - R_1^3)/3*current_p[N_R1]));
+        Ct_o2 <- c(Ct_o2, 3 /(R^3 - R_0^3) * ( sum(diff(points[N_R0p:N_R1]) * (current_o2[N_R0p:(N_R1 - 1)] + current_o2[(N_R0p + 1):N_R1])/2 * ((points[N_R0p:(N_R1 - 1)] + points[(N_R0p + 1):N_R1])/2)^2) + (R^3 - R_1^3)/3*current_o2[N_R1]));
         cat(".");
-        plot(points, current_l, type='o', ylim = c(0, L_0));
-        lines(points, current_o2, type='o');
+        #png(paste("/tmp/img1/",time,".png"))
+        plot(points, current_l, type='o', ylim = c(0, L_0), col = 'blue');
+        lines(points, current_o2*100, type='o', col = 'red');
+        #dev.off()
     }
 }
+
+
+
+plot(points, l_list1[1:62 + (1-1)*62], type='o', ylim = c(0, L_0), col = 'blue');
+
+for(k in 1:10){
+#plot(points, l_list1[1:62 + (1-1)*62], type='o', ylim = c(0, L_0), col = 'blue');
+    png(paste("/tmp/img2/i_",k,".png", sep=""))
+    plot(points, l_list1[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'blue', pch = 1);
+    lines(points, o_list1[1:62 + (k-1)*62]*100, type='o', col = 'blue', pch = 1);
+    
+    lines(points, l_list2[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'black', pch = 2);
+    lines(points, o_list2[1:62 + (k-1)*62]*100, type='o', col = 'black', pch = 2);
+    
+    lines(points, l_list3[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'red', pch = 3);
+    lines(points, o_list3[1:62 + (k-1)*62]*100, type='o', col = 'red', pch = 3);
+    legend("bottomright", c(TeX("$D_{O_2, d}$"), TeX("$D_{O_2, d}=D_{O_2, m}$"), TeX("$D_{O_2, d} = 2*D_{O_2, d}$")), col = c('blue', 'black', 'red'), lty = c(1,1,1), pch = c(1,2,3))
+    dev.off()
+}
+
+
+
+for(k in 1:500){
+    #plot(points, l_list1[1:62 + (1-1)*62], type='o', ylim = c(0, L_0), col = 'blue');
+    png(paste("/tmp/img3/i_",k,".png", sep=""))
+    #plot(points[1:62], l_list1[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'blue', pch = 1);
+    plot(points[1:42], o_list1[1:42 + (k-1)*62]*1000, ylim = c(0, O2_0*1000), type='o', col = 'blue', pch = 1, ylab = "O_2", xlab = "radius");
+    
+    #lines(points[1:62], l_list2[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'black', pch = 2);
+    lines(points[1:42], o_list2[1:42 + (k-1)*62]*1000, type='o', col = 'black', pch = 2);
+    
+    #lines(points[1:62], l_list3[1:62 + (k-1)*62], ylim = c(0, L_0), type='o', col = 'red', pch = 3);
+    lines(points[1:42], o_list3[1:42 + (k-1)*62]*1000, type='o', col = 'red', pch = 3);
+    #legend("bottomright", c(TeX("$D_{O_2, d}$"), TeX("$D_{O_2, d}=D_{O_2, m}$"), TeX("$D_{O_2, d} = 2*D_{O_2, d}$")), col = c('blue', 'black', 'red'), lty = c(1,1,1), pch = c(1,2,3))
+    legend("bottomright", c(TeX("$D_{O_2, d}$"), TeX("$D_{O_2, d}=D_{O_2, m}$"), TeX("$D_{O_2, d} = 10*D_{O_2, d}$")), col = c('blue', 'black', 'red'), lty = c(1,1,1), pch = c(1,2,3))
+    dev.off()
+}
+
+
+
 
 cbind(points, current_o2, result$O2)
 cbind(points, current_l, result$L)

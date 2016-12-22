@@ -39,6 +39,8 @@ void json_fill(struct bio_params *bio_info, std::string configs = "../config/par
     // [s]
     bio_info->resp_t = 20;
 
+    bio_info->dimensionless = false;
+
     bio_info->out_file_name = "output.dat";
     bio_info->write_to_file = true;
     bio_info->ne = 1;
@@ -109,10 +111,12 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->min_t = 100;
 
 	// [s]
-    bio_info->resp_t = 0;
+    bio_info->resp_t = 20;
+
+    bio_info->dimensionless = false;
 
     bio_info->out_file_name = "output.dat";
-    bio_info->write_to_file = false;
+    bio_info->write_to_file = true;
 
     bio_info->ne = 1;
 
@@ -156,14 +160,14 @@ void static_fill(struct bio_params *bio_info) {
 
 int main() {
     struct bio_params *bio_info = new bio_params;
-    std::vector<double> P, L, O2, t, CP, CL, CO2;
+    std::vector<double> P, L, O2, t, CP, CL, CO2, points;
 
 #ifdef JSON
     json_fill(bio_info);
 #else
     static_fill(bio_info);
 #endif
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
 
 
     free(bio_info->layers);

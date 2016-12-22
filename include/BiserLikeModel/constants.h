@@ -8,7 +8,10 @@
 #define INCLUDE_BISERLIKEMODEL_CONSTANTS_H_
 
 #define EPSILON  1e-3
-#define PRINT_RATE 50000
+const int PRINT_RATE = 500000;
+const int DIVISION_RATE = 4000;
+
+
 
 //  Faradėjaus konstanta [C/mol]
 #define F 96485

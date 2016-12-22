@@ -16,8 +16,11 @@ namespace BiserLikeModel {
 
 double MM2(double _v1, double _v2);
 double MM(double _val, double _vmax, double _km);
+double MM3(double l1, double o2, double beta);
+
 double LaplacePolar0(double valc, double valp, double dr);
 double LaplacePolar(double valm, double valc, double valp, double dr, double r);
+double averageConcentration(double *array, double *points, double delta, int r_0p, int r_1, int r);
 
 
 void SwapArrays(double **array1, double **array2);

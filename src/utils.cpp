@@ -23,6 +23,10 @@ double MM(double val, double vmax, double km) {
     return (vmax * val) / (km + val);
 }
 
+double MM3(double l1, double o2, double beta){
+    return (beta * l1 * o2) / (beta*l1 + (2 + beta) * l1 * o2 + 2 * o2);
+}
+
 double MM2(double v1, double v2) {
     double val = 0;
     if(Likely(v1 || v2)) {
@@ -31,6 +35,23 @@ double MM2(double v1, double v2) {
         val = 0;
     }
     return val;
+}
+
+double averageConcentration(double *array, double *points, double delta, int r_0p, int r_1, int r) {
+    double conc = 0.;
+    int a;
+	//printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
+
+    for(a = r_0p; a < r_1; a++) {
+        conc += delta * ((array[a + 1] + array[a]) / 2) * pow((points[a + 1] + points[a]) / 2, 2);
+    }
+
+    conc += (pow(points[r], 3) - pow(points[r_1], 3))/3 * array[r_1];
+
+	//printf("<- %f %f %f ", 3/(pow(points[r], 3) - pow(points[r_0p], 3)));
+    conc *= 3/(pow(points[r], 3) - pow(points[r_0p], 3));
+
+	return conc;
 }
 
 void SwapArrays(double **array1, double **array2) {
