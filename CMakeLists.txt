@@ -10,7 +10,7 @@ set (INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set (GTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest")
 
 set (JSON 0)
-set (TESTING 1)
+set (TESTING 0)
 
 
 if (JSON)
