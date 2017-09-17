@@ -52,8 +52,8 @@ TEST(MM, usage) {
 
 TEST(LaplacePolar0, usage) {
 
-    EXPECT_NEAR(LaplacePolar0(0, 1, 1.), 2, EPSILION);
-    EXPECT_NEAR(LaplacePolar0(1, 0, 1.), -2, EPSILION);
+    EXPECT_NEAR(LaplaceSperical0(0, 1, 1.), 2, EPSILION);
+    EXPECT_NEAR(LaplaceSperical0(1, 0, 1.), -2, EPSILION);
 
 
 }
