@@ -62,6 +62,7 @@ struct bio_params {
     bool write_to_file;
 
     bool dimensionless;
+    bool spherical;
 
     // Elektronų, dalyvaujančių krūvio pernešime, skaičius
     int ne;

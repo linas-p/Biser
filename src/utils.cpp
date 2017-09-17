@@ -8,14 +8,24 @@
 
 namespace BiserLikeModel {
 
-double LaplacePolar(double valm, double valc, double valp, double dr, double r) {
-    double val = (valp - 2 * valc + valm) / (dr * dr)
-                 + (1 / r) * (valp - valm)/(dr);
+double Laplace(double valm, double valc, double valp, double dh) {
+    double val = (valp - 2 * valc + valm) / (dh * dh);
     return val;
-
 }
 
-double LaplacePolar0(double valc, double valp, double dr) {
+
+double LaplaceSperical(double valm, double valc, double valp, double dr, double r) {
+    double val = (valp - 2 * valc + valm) / (dr * dr)
+                 + (2. / r) * (valp - valm)/(dr);
+    return val;
+}
+
+double Laplace0(double valc, double valp, double dh) {
+    return (2 * (valp - valc) / std::pow(dh, 2));
+}
+
+
+double LaplaceSperical0(double valc, double valp, double dr) {
     return (2 * (valp - valc) / std::pow(dr, 2));
 }
 
@@ -54,6 +64,21 @@ double averageConcentration(double *array, double *points, double delta, int r_0
 	return conc;
 }
 
+
+double averageRate(double *array, double *points, double delta, int r_0, int r_1, double vmax, double km) {
+    double rate = 0.;
+    int a;
+	//printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
+
+    for(a = r_0; a < r_1; a++) {
+        rate += delta * MM((array[a + 1] + array[a]) / 2, vmax, km) * pow((points[a + 1] + points[a]) / 2, 2);
+    }
+
+
+
+	return rate;
+}
+
 void SwapArrays(double **array1, double **array2) {
     double *temp;
 
@@ -72,6 +97,14 @@ void condition_assing(double *array1, double *array2, int length, \
                       double value) {
     for (int a = 0; a < length; a++)
         array1[a] = array2[a]*value;
+}
+
+double calc_L2(double *array1, double *array2, int length) {
+    double result = 0.;
+    for (int a = 0; a < length; a++)
+         result += (array2[a] - array1[a])*(array2[a] - array1[a]);
+    result /= (double)length;
+    return result;
 }
 
 void PrintArray(double *array, int length) {
