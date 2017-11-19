@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2016
+ *  Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -21,10 +21,13 @@ double MM3(double l1, double o2, double beta);
 double Laplace0(double valc, double valp, double dr);
 double Laplace(double valm, double valc, double valp, double dr);
 double LaplaceSperical0(double valc, double valp, double dr);
-double LaplaceSperical(double valm, double valc, double valp, double dr, double r);
+double LaplaceSperical(double valm, double valc, double valp, double dr,
+                       double r);
 
-double averageConcentration(double *array, double *points, double delta, int r_0p, int r_1, int r);
-double averageRate(double *array, double *points, double delta, int r_0, int r_1, double vmax, double km);
+double averageConcentration(double *array, double *points, double delta,
+                            int r_0p, int r_1, int r, bool scale);
+double averageRate(double *array, double *points, double delta, int r_0,
+                   int r_1, double vmax, double km);
 
 void SwapArrays(double **array1, double **array2);
 void condition_assing(double *array1, double *array2, int length, double value);

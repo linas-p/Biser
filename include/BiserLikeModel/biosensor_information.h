@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2016
+ *  Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -14,7 +14,8 @@ enum resp_method {
     DEFAULT_TIME,  // 0 - iki pusiausvyros
     MIN_TIME,      // 1 - iki pusiausvyros su nurodytu minimaliu laiku
     FIXED_TIME,     // 2 - fiksuotas laikas
-    HALF_TIME     // 3 - iki duotos salygos laikas
+    HALF_TIME,     // 3 - iki duotos salygos laikas
+    CML_TIME     // 4 - iki duotos komulatyvios salygos laikas
 };
 
 enum layer {
@@ -33,7 +34,7 @@ struct layer_params {
     double Dpr;
     double Do2;
 
-    // Sluoksnio storis (cm)
+    // Sluoksnio storis (m)
     double d;
 };
 
@@ -41,9 +42,9 @@ struct bio_params {
 
     // Pusiausvyros konstantos (M)
     double km1, km2;
-	double rho;
+    double rho;
 
-	//double kcat1, kcat2;
+    //double kcat1, kcat2;
     // Greicio konstantos (M/s)
     double vmax1, vmax2;
 

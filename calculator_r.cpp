@@ -1,5 +1,4 @@
-/*
- *  Copyright (c) Linas Petkevicius 2016
+/* Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -88,19 +87,20 @@ void json_fill(struct bio_params *bio_info, \
 
 void r_fill(struct bio_params *bio_info, const Rcpp::NumericVector & values) {
 
-    // [mol/l] -> [mol/cm^3]
+    // [mol/l] -> [mol/m^3]
     bio_info->km1 = values[0];
     bio_info->km2 = values[1];
 
-    // [mol/l] -> [mol/cm^3]
+    // [mol/l] -> [mol/m^3]
     bio_info->vmax1 = values[2];
     bio_info->vmax2 = values[3];
 
     // [s]
     bio_info->dt = values[4];
     bio_info->n = values[5];
-    bio_info->resp_t_meth = HALF_TIME;
-    //bio_info->resp_t_meth = FIXED_TIME;
+    //bio_info->resp_t_meth = HALF_TIME;
+    bio_info->resp_t_meth = FIXED_TIME;
+    //bio_info->resp_t_meth = CML_TIME;
 
     // [s]
     bio_info->min_t = 100;
@@ -113,45 +113,45 @@ void r_fill(struct bio_params *bio_info, const Rcpp::NumericVector & values) {
     bio_info->write_to_file = false;
     bio_info->ne = 1;
 
-    // [mol/l] -> [mol/cm^3]
+    // [mol/l] -> [mol/m^3]
     bio_info->pr_0 = values[6];
     bio_info->l_0 = values[7];
     bio_info->o2_0 = values[8];
 
     bio_info->rho = values[9];
 
-    bio_info->layer_count = 3;
+    bio_info->layer_count = 2;
     bio_info->layers = new layer_params[bio_info->layer_count];
 
     // Užpildoma sluoksnių informacija
     // 0
     bio_info->layers[0].enz_layer = values[10];
-    // [um^2/s] -> [cm^2/s]
+    // [um^2/s] -> [m^2/s]
     bio_info->layers[0].Dl = values[11];
     bio_info->layers[0].Do2 = values[12];
     bio_info->layers[0].Dpr = values[13];
-    // [um] -> [cm]
+    // [um] -> [m]
     bio_info->layers[0].d = values[14];
 
     // 1
     bio_info->layers[1].enz_layer =  values[15];
-    // [um^2/s] -> [cm^2/s]
+    // [um^2/s] -> [m^2/s]
     bio_info->layers[1].Dl =  values[16];
     bio_info->layers[1].Do2 = values[17];
     bio_info->layers[1].Dpr = values[18];
 
-    // [um] -> [cm]
+    // [um] -> [m]
     bio_info->layers[1].d = values[19];
 
     // 2
-    bio_info->layers[2].enz_layer =  values[20];
-    // [um^2/s] -> [cm^2/s]
+    /*bio_info->layers[2].enz_layer =  values[20];
+    // [um^2/s] -> [m^2/s]
     bio_info->layers[2].Dl =  values[21];
     bio_info->layers[2].Do2 = values[22];
     bio_info->layers[2].Dpr = values[23];
 
-    // [um] -> [cm]
-    bio_info->layers[2].d = values[24];
+    // [um] -> [m]
+    bio_info->layers[2].d = values[24];*/
 
 }
 
@@ -167,14 +167,15 @@ RcppExport SEXP calculate(SEXP x) {
     r_fill(bio_info, params);
     //json_fill(bio_info);
 
-    std::vector<double> P, L, O2, t, CP, CL, CO2, points;
+    std::vector<double> P, L, O2, t, CP, CL, CO2, points, chr;
     t.reserve(DIVISION_RATE + 3);
     CP.reserve(DIVISION_RATE + 3);
     CL.reserve(DIVISION_RATE + 3);
     CO2.reserve(DIVISION_RATE + 3);
 
     std::clock_t start = std::clock();
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    //calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    two_layer_model(bio_info, NULL, &callback_crunched, &points, &P, &L, &t, &CL, &CP, &chr);
 
     double time = (std::clock()-start)/ static_cast<double>(CLOCKS_PER_SEC);
     std::cout << "\n all time " << time << std::endl;
@@ -190,9 +191,11 @@ RcppExport SEXP calculate(SEXP x) {
     return(Rcpp::List::create(Rcpp::Named("points")=points,
                               Rcpp::Named("P")=PP,
                               Rcpp::Named("L")=LL,
-                              Rcpp::Named("O2")=OO2,
+                              /*Rcpp::Named("O2")=OO2,*/
                               Rcpp::Named("T")=t,
                               Rcpp::Named("CL")=CL,
                               Rcpp::Named("CP")=CP,
-                              Rcpp::Named("CO2")=CO2));
+                              /*cpp::Named("CO2")=CO2 */
+                              Rcpp::Named("characteristics") = chr
+                              ));
 }

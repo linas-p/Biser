@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2016
+ *  Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -28,9 +28,8 @@ void two_layer_model(struct bio_params *bio_info, void *ptr, \
                           std::vector<double> * P, \
                           std::vector<double> * L, \
                           std::vector<double> * t, \
-                          std::vector<double> * Ct_g,\
-                          std::vector<double> * Ct_p,
-                          std::vector<double> * Ot_p,\
+                          std::vector<double> * Ct_s,\
+                          std::vector<double> * Ct_p,\
                           std::vector<double> * Chr
                           );
 

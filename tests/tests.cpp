@@ -1,5 +1,4 @@
-/* Copyright 2016
- * Linas Petkevicius
+/* Copyright 2017 Linas Petkevicius
  * Vilnius University
  * GNU General Public License
  * */

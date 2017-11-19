@@ -1,5 +1,4 @@
-/*
- *  Copyright (c) Linas Petkevicius 2016
+/* Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -49,7 +48,7 @@ void json_fill(struct bio_params *bio_info, std::string configs = "../config/par
     bio_info->pr_0 = j["initial_conditions"]["product_0"];
     bio_info->l_0 = j["initial_conditions"]["laccase_0"];
     bio_info->o2_0 = j["initial_conditions"]["oxygen_0"];
-	bio_info->rho = j["rho"];
+    bio_info->rho = j["rho"];
 
 
     bio_info->layer_count = j["layers"].size();
@@ -97,7 +96,7 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->km1 = 9.6 * 1e-3;
     bio_info->km2 = 5 * 1e-4;
 
-	// M/s
+    // M/s
     bio_info->vmax1 = 1.9 * 1e-4;
     bio_info->vmax2 = 3.9 * 1e-4;
 
@@ -107,16 +106,16 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->n = 4;
     bio_info->resp_t_meth = FIXED_TIME;
 
-	// [s]
+    // [s]
     bio_info->min_t = 100;
 
-	// [s]
+    // [s]
     bio_info->resp_t = 20;
 
     bio_info->dimensionless = false;
 
     bio_info->out_file_name = "output.dat";
-    bio_info->write_to_file = true;
+    bio_info->write_to_file = false;
 
     bio_info->ne = 1;
 
@@ -125,7 +124,7 @@ void static_fill(struct bio_params *bio_info) {
     bio_info->l_0 = 2e-3;
     bio_info->o2_0 = 2.5 * 1e-4;
 
-	bio_info->rho = 0.56;
+    bio_info->rho = 0.56;
     bio_info->layer_count = 3;
     bio_info->layers = new layer_params[bio_info->layer_count];
 
@@ -160,18 +159,18 @@ void static_fill(struct bio_params *bio_info) {
 
 int main() {
     struct bio_params *bio_info = new bio_params;
-    std::vector<double> P, L, O2, t, CP, CL, CO2, points;
+    std::vector<double> P, L, O2, t, CP, CL, CO2, points, chr;
 
 #ifdef JSON
     json_fill(bio_info);
 #else
     static_fill(bio_info);
 #endif
-    calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    //calculate_explicitly(bio_info, NULL, &callback_crunched, &points, &P, &L, &O2, &t, &CL, &CP, &CO2);
+    two_layer_model(bio_info, NULL, &callback_crunched, &points, &P, &L, &t, &CL, &CP, &chr);
 
-
-    free(bio_info->layers);
-    free(bio_info);
+    delete [] bio_info->layers;
+    delete bio_info;
 
     return 0;
 }

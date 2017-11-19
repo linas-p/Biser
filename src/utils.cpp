@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Linas Petkevicius 2016
+ *  Copyright (c) Linas Petkevicius 2017
  *  Vilnius University
  *  GNU General Public license
  * */
@@ -33,7 +33,7 @@ double MM(double val, double vmax, double km) {
     return (vmax * val) / (km + val);
 }
 
-double MM3(double l1, double o2, double beta){
+double MM3(double l1, double o2, double beta) {
     return (beta * l1 * o2) / (beta*l1 + (2 + beta) * l1 * o2 + 2 * o2);
 }
 
@@ -47,36 +47,40 @@ double MM2(double v1, double v2) {
     return val;
 }
 
-double averageConcentration(double *array, double *points, double delta, int r_0p, int r_1, int r) {
+double averageConcentration(double *array, double *points, double delta,
+                            int r_0p, int r_1, int r, bool scale) {
     double conc = 0.;
     int a;
-	//printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
+    //printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
 
     for(a = r_0p; a < r_1; a++) {
-        conc += delta * ((array[a + 1] + array[a]) / 2) * pow((points[a + 1] + points[a]) / 2, 2);
+        conc += delta * ((array[a + 1] + array[a]) / 2) * pow((points[a + 1] +
+                points[a]) / 2, 2);
     }
 
-    conc += (pow(points[r], 3) - pow(points[r_1], 3))/3 * array[r_1];
+    if (scale) {
+        conc += (pow(points[r], 3) - pow(points[r_1], 3))/3 * array[r_1];
 
-	//printf("<- %f %f %f ", 3/(pow(points[r], 3) - pow(points[r_0p], 3)));
-    conc *= 3/(pow(points[r], 3) - pow(points[r_0p], 3));
+        //printf("<- %f %f %f ", 3/(pow(points[r], 3) - pow(points[r_0p], 3)));
+    } else {
+        conc *= 3.0 / (pow(points[r], 3));
+    }
 
-	return conc;
+    return conc;
 }
 
 
-double averageRate(double *array, double *points, double delta, int r_0, int r_1, double vmax, double km) {
+double averageRate(double *array, double *points, double delta, int r_0,
+                   int r_1, double vmax, double km) {
     double rate = 0.;
     int a;
-	//printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
+    //printf("<- %f %f %f ", points[r_0p], points[r_1], points[r]);
 
     for(a = r_0; a < r_1; a++) {
-        rate += delta * MM((array[a + 1] + array[a]) / 2, vmax, km) * pow((points[a + 1] + points[a]) / 2, 2);
+        rate += delta * MM((array[a] + array[a + 1]) / 2, vmax, km) *
+                pow((points[a] + points[a + 1]) / 2, 2);
     }
-
-
-
-	return rate;
+    return rate;
 }
 
 void SwapArrays(double **array1, double **array2) {
@@ -102,7 +106,7 @@ void condition_assing(double *array1, double *array2, int length, \
 double calc_L2(double *array1, double *array2, int length) {
     double result = 0.;
     for (int a = 0; a < length; a++)
-         result += (array2[a] - array1[a])*(array2[a] - array1[a]);
+        result += (array2[a] - array1[a])*(array2[a] - array1[a]);
     result /= (double)length;
     return result;
 }

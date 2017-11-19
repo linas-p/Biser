@@ -17,7 +17,10 @@ dx_m <- R_0 / N;
 dx_d <- (R_1-R_0) / N;
 dx_b <- (R - R_1) / N;
 
+# three layers
 points <- cumsum(c(0, rep(dx_m, N), 0, rep(dx_d, N), rep(dx_b, N)));
+# two layers
+points <- cumsum(c(0, rep(dx_m, N), 0, rep(dx_d, N)));
 
 dt<- (min(dx_m, dx_d, dx_b))^2/(2);
 
